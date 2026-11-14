@@ -1,0 +1,12 @@
+{
+  "val-aux/math/reward/mean@1": 0.838,
+  "val-aux/math/score/mean@1": 0.838,
+  "val-aux/math/acc/mean@1": 0.838,
+  "val-aux/math/response_length/mean@1": 2488.806,
+  "val-aux/math/enforce_nothinking/mean@1": 0.0,
+  "val-aux/math/is_nothinking/mean@1": 0.49,
+  "val-aux/math/nothinking_response_length/mean@1": 701.0734693877552,
+  "val-aux/math/nothinking_acc/mean@1": 0.9306122448979591,
+  "val-aux/math/thinking_response_length/mean@1": 4206.431372549019,
+  "val-aux/math/thinking_acc/mean@1": 0.7490196078431373
+}

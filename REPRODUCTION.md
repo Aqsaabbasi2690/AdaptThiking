@@ -26,7 +26,7 @@ Largest gaps: GSM8K AdaptThink length (552 vs 480) and AIME24 NoThinking ratio (
 
 ## 2. NoThinking share and accuracy by MATH level
 
-## MATH500 by difficulty level (AdaptThink-1.5B d0.05 vs original, ours vs paper)
+### MATH500 by difficulty level (AdaptThink-1.5B d0.05 vs original, ours vs paper)
 
 Unmatched rows (should be 0): 0; difficulty values seen: [1.0, 2.0, 3.0, 4.0, 5.0]
 
@@ -38,7 +38,7 @@ Unmatched rows (should be 0): 0; difficulty values seen: [1.0, 2.0, 3.0, 4.0, 5.
 | 4.0 | 128 | 78.9 | 78.1 | 82.8 | 78.9 | 1720 | 4591 |
 | 5.0 | 134 | 61.2 | 61.9 | 65.7 | 64.2 | 3451 | 7319 |
 
-## Implicit thinking in AdaptThink NoThinking responses (keywords: Wait / Alternatively)
+### Implicit thinking in AdaptThink NoThinking responses (keywords: Wait / Alternatively)
 
 | Dataset | NoThinking responses | with keyword % | avg length (tokens) |
 |---|---|---|---|
@@ -95,6 +95,44 @@ Result: accuracy changes of -0.3 (GSM8K), +0.8 (MATH500) and +2.4 (AIME24) point
 These are within sampling noise for 1 sample/problem, and the paper's own delta=0 training run (MATH500 86.0%, AIME24 34.8%)
 reaches higher accuracy than this estimate. **The idea is not supported by this data.**
 The estimate is optimistic (it uses mean original accuracy, not an actual restarted sample).
+
+## 5. Effect of delta (paper Table 2): released checkpoints, GSM8K and MATH500
+
+All six released AdaptThink-1.5B checkpoints (delta 0 to 0.1) were re-evaluated with the same settings as above. AIME24 was not run for these.
+
+### GSM8K
+
+| delta | Acc (ours) | Acc (paper) | Length (ours) | Length (paper) | NoThinking % (ours) | NoThinking % (paper) |
+|---|---|---|---|---|---|---|
+| original | 78.5 | 79.0 | 1022 | 978 | 0.0 | 0.0 |
+| 0 | 83.5 | 84.6 | 723 | 718 | 71.5 | 70.4 |
+| 0.01 | 81.8 | 82.4 | 673 | 638 | 60.3 | 55.6 |
+| 0.02 | 83.1 | 83.1 | 630 | 628 | 75.8 | 75.7 |
+| 0.05 | 83.2 | 83.1 | 552 | 480 | 87.6 | 86.9 |
+| 0.075 | 83.9 | 83.2 | 568 | 580 | 74.2 | 71.8 |
+| 0.1 | 82.9 | 82.5 | 386 | 358 | 91.7 | 91.7 |
+
+### MATH500
+
+| delta | Acc (ours) | Acc (paper) | Length (ours) | Length (paper) | NoThinking % (ours) | NoThinking % (paper) |
+|---|---|---|---|---|---|---|
+| original | 81.0 | 80.6 | 4593 | 4887 | 0.0 | 0.0 |
+| 0 | 83.8 | 86.0 | 2489 | 2511 | 49.0 | 50.0 |
+| 0.01 | 83.4 | 82.4 | 2631 | 2473 | 56.4 | 67.0 |
+| 0.02 | 82.8 | 83.4 | 2215 | 2337 | 62.6 | 62.6 |
+| 0.05 | 83.2 | 82.0 | 1796 | 1782 | 77.0 | 76.8 |
+| 0.075 | 81.2 | 80.2 | 1670 | 1621 | 84.0 | 84.2 |
+| 0.1 | 80.6 | 78.2 | 1220 | 1272 | 92.8 | 90.4 |
+
+
+![delta sweep](results/delta_sweep.png)
+
+Observations:
+- All 12 accuracy comparisons are within 2.4 points of the paper. With 500 problems and one sample each, a single run has a standard error of about 1.7 points, so differences of up to about 3 points between two runs are expected.
+- The trend matches the paper: a larger delta gives a higher NoThinking share and shorter responses. On MATH500, the accuracy gain over the original disappears at delta=0.1 (80.6 vs 81.0).
+- On GSM8K, the NoThinking share is not monotone in delta (dips at 0.01 and 0.075) in both the paper and this re-evaluation. It reappears despite re-sampling, which suggests it comes from the checkpoints themselves (each delta is a separate training run) rather than evaluation noise. This is an interpretation, not a tested claim.
+- Largest discrepancy: MATH500 at delta=0.01, NoThinking share 56.4% vs 67.0% in the paper. Our MATH500 curve is monotone in delta, the paper's is not (its delta=0.01 value is above delta=0.02). The cause is unknown; the released checkpoint may differ from the one behind the paper's table.
+- Response lengths are mostly within 8% of the paper; the largest gap is GSM8K at delta=0.05 (552 vs 480 tokens).
 
 ## Limitations
 

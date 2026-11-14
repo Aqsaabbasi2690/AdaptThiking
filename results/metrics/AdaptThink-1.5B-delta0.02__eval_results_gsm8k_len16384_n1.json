@@ -1,0 +1,12 @@
+{
+  "val-aux/gsm8k/reward/mean@1": 0.8309325246398787,
+  "val-aux/gsm8k/score/mean@1": 0.8309325246398787,
+  "val-aux/gsm8k/acc/mean@1": 0.8309325246398787,
+  "val-aux/gsm8k/response_length/mean@1": 630.4541319181197,
+  "val-aux/gsm8k/enforce_nothinking/mean@1": 0.0,
+  "val-aux/gsm8k/is_nothinking/mean@1": 0.7581501137225171,
+  "val-aux/gsm8k/nothinking_response_length/mean@1": 486.176,
+  "val-aux/gsm8k/nothinking_acc/mean@1": 0.833,
+  "val-aux/gsm8k/thinking_response_length/mean@1": 1082.7366771159875,
+  "val-aux/gsm8k/thinking_acc/mean@1": 0.8244514106583072
+}
