@@ -50,3 +50,14 @@ Observed wall-clock for both models: GSM8K ~1 h, MATH500 ~2 h, AIME24 ~9.5 h.
 | Paste does not work in WSL terminal | `Ctrl+Shift+V`, or use VS Code with the WSL extension |
 
 The GPU memory settings are what worked on this machine; I did not isolate which single setting was the decisive one.
+
+## 5. Evaluating other checkpoints (delta sweep)
+
+`run_eval_local.sh` takes a space-separated list of model directories in `MODELS`
+(default: original DeepSeek-R1-Distill-Qwen-1.5B and AdaptThink-1.5B-delta0.05):
+
+    M="$HOME/models/AdaptThink-1.5B-delta0 $HOME/models/AdaptThink-1.5B-delta0.01"
+    MODELS="$M" VAL_SETS="gsm8k" bash scripts/run_eval_local.sh
+
+Then `python analysis/delta_sweep.py` builds the table in `results/delta_sweep.md`.
+Wall-clock on the RTX A4500: GSM8K plus MATH500 for the five extra checkpoints took roughly 3.5 hours in total.

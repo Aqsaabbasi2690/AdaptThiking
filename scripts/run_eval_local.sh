@@ -16,7 +16,7 @@ rollout=1
 end_of_think_token_id=151649     # </think>
 non_end_of_think_token_id=71486  # "Alright"
 
-MODEL_PATH_LIST=("$HOME/models/DeepSeek-R1-Distill-Qwen-1.5B" "$HOME/models/AdaptThink-1.5B-delta0.05")
+MODEL_PATH_LIST=(${MODELS:-$HOME/models/DeepSeek-R1-Distill-Qwen-1.5B $HOME/models/AdaptThink-1.5B-delta0.05})
 for MODEL_PATH in "${MODEL_PATH_LIST[@]}"; do
     NAME=${MODEL_PATH##*/}
     CKPT_DIR=$HOME/AdaptThink/outputs/$NAME
