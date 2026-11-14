@@ -1,0 +1,1248 @@
++ set -f
++ export HYDRA_FULL_ERROR=1
++ HYDRA_FULL_ERROR=1
++ VAL_SETS='aime*16'
++ val_files='['
++ for s in $VAL_SETS
++ val_files+=''\''./data/test/preprocessed_data/aime*16.parquet'\'','
++ val_files='['\''./data/test/preprocessed_data/aime*16.parquet'\'']'
++ train_files=./data/train/preprocessed_data/deepscaler.parquet
++ batch_size=128
++ max_response_length=16384
++ rollout=1
++ end_of_think_token_id=151649
++ non_end_of_think_token_id=71486
++ MODEL_PATH_LIST=("$HOME/models/DeepSeek-R1-Distill-Qwen-1.5B" "$HOME/models/AdaptThink-1.5B-delta0.05")
++ for MODEL_PATH in "${MODEL_PATH_LIST[@]}"
++ NAME=DeepSeek-R1-Distill-Qwen-1.5B
++ CKPT_DIR=/home/aipmu/AdaptThink/outputs/DeepSeek-R1-Distill-Qwen-1.5B
+++ echo 'aime*16'
+++ tr ' *' __
++ TAG=aime_16
++ RESULT_SAVE_DIR=/home/aipmu/AdaptThink/outputs/DeepSeek-R1-Distill-Qwen-1.5B/eval_results_aime_16_len16384_n1
++ EXP_NAME=eval-aime_16-len16384-n1-DeepSeek-R1-Distill-Qwen-1.5B
++ echo 'EVAL MODEL: /home/aipmu/models/DeepSeek-R1-Distill-Qwen-1.5B'
+EVAL MODEL: /home/aipmu/models/DeepSeek-R1-Distill-Qwen-1.5B
++ python3 -m src.main_ppo algorithm.adv_estimator=naive reward_model.reward_manager=adapt_think data.train_files=./data/train/preprocessed_data/deepscaler.parquet 'data.val_files=['\''./data/test/preprocessed_data/aime*16.parquet'\'']' data.train_batch_size=128 data.val_batch_size=128 data.max_prompt_length=4096 data.max_response_length=16384 actor_rollout_ref.adapt_think.eot_token_id=151649 actor_rollout_ref.adapt_think.non_eot_token_id=71486 actor_rollout_ref.model.path=/home/aipmu/models/DeepSeek-R1-Distill-Qwen-1.5B actor_rollout_ref.model.use_remove_padding=True actor_rollout_ref.actor.ppo_mini_batch_size=128 actor_rollout_ref.actor.use_dynamic_bsz=True actor_rollout_ref.actor.fsdp_config.param_offload=True actor_rollout_ref.actor.fsdp_config.optimizer_offload=True actor_rollout_ref.ref.fsdp_config.param_offload=True actor_rollout_ref.rollout.tensor_model_parallel_size=1 actor_rollout_ref.rollout.name=vllm actor_rollout_ref.rollout.gpu_memory_utilization=0.9 actor_rollout_ref.rollout.max_num_seqs=64 actor_rollout_ref.rollout.val_kwargs.do_sample=True actor_rollout_ref.rollout.val_kwargs.n=1 actor_rollout_ref.rollout.val_kwargs.temperature=0.6 actor_rollout_ref.rollout.val_kwargs.top_p=0.95 actor_rollout_ref.rollout.max_num_batched_tokens=24576 actor_rollout_ref.rollout.enable_chunked_prefill=True 'trainer.logger=[console]' trainer.project_name=adapt_think_verl-eval trainer.experiment_name=eval-aime_16-len16384-n1-DeepSeek-R1-Distill-Qwen-1.5B trainer.val_before_train=True +trainer.val_only=True +trainer.val_result_save_dir=/home/aipmu/AdaptThink/outputs/DeepSeek-R1-Distill-Qwen-1.5B/eval_results_aime_16_len16384_n1 trainer.n_gpus_per_node=1 trainer.nnodes=1 trainer.default_local_dir=/home/aipmu/AdaptThink/outputs/DeepSeek-R1-Distill-Qwen-1.5B custom_reward_function.path=./src/adapt_think_rm.py custom_reward_function.name=adapt_think_rm
+2026-11-12 15:00:10,710	WARNING authentication_token_setup.py:85 -- Token authentication is enabled for this Ray cluster. Set RAY_AUTH_MODE=disabled to opt out. For more information, see https://docs.ray.io/en/latest/ray-security/token-auth.html
+2026-11-12 15:00:13,882	INFO worker.py:2029 -- Started a local Ray instance. View the dashboard at [1m[32m127.0.0.1:8265 [39m[22m
+[36m(TaskRunner pid=174686)[0m {'actor_rollout_ref': {'actor': {'checkpoint': {'contents': ['model',
+[36m(TaskRunner pid=174686)[0m                                                              'optimizer',
+[36m(TaskRunner pid=174686)[0m                                                              'extra']},
+[36m(TaskRunner pid=174686)[0m                                  'clip_ratio': 0.2,
+[36m(TaskRunner pid=174686)[0m                                  'clip_ratio_c': 3.0,
+[36m(TaskRunner pid=174686)[0m                                  'clip_ratio_high': 0.2,
+[36m(TaskRunner pid=174686)[0m                                  'clip_ratio_low': 0.2,
+[36m(TaskRunner pid=174686)[0m                                  'entropy_coeff': 0.001,
+[36m(TaskRunner pid=174686)[0m                                  'fsdp_config': {'fsdp_size': -1,
+[36m(TaskRunner pid=174686)[0m                                                  'optimizer_offload': True,
+[36m(TaskRunner pid=174686)[0m                                                  'param_offload': True,
+[36m(TaskRunner pid=174686)[0m                                                  'wrap_policy': {'min_num_params': 0}},
+[36m(TaskRunner pid=174686)[0m                                  'grad_clip': 1.0,
+[36m(TaskRunner pid=174686)[0m                                  'kl_loss_coef': 0.001,
+[36m(TaskRunner pid=174686)[0m                                  'kl_loss_type': 'low_var_kl',
+[36m(TaskRunner pid=174686)[0m                                  'loss_agg_mode': 'token-mean',
+[36m(TaskRunner pid=174686)[0m                                  'optim': {'lr': 1e-06,
+[36m(TaskRunner pid=174686)[0m                                            'lr_warmup_steps': -1,
+[36m(TaskRunner pid=174686)[0m                                            'lr_warmup_steps_ratio': 0.0,
+[36m(TaskRunner pid=174686)[0m                                            'min_lr_ratio': None,
+[36m(TaskRunner pid=174686)[0m                                            'total_training_steps': -1,
+[36m(TaskRunner pid=174686)[0m                                            'warmup_style': 'constant',
+[36m(TaskRunner pid=174686)[0m                                            'weight_decay': 0.01},
+[36m(TaskRunner pid=174686)[0m                                  'ppo_epochs': 1,
+[36m(TaskRunner pid=174686)[0m                                  'ppo_max_token_len_per_gpu': 16384,
+[36m(TaskRunner pid=174686)[0m                                  'ppo_micro_batch_size': None,
+[36m(TaskRunner pid=174686)[0m                                  'ppo_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=174686)[0m                                  'ppo_mini_batch_size': 128,
+[36m(TaskRunner pid=174686)[0m                                  'shuffle': False,
+[36m(TaskRunner pid=174686)[0m                                  'strategy': 'fsdp',
+[36m(TaskRunner pid=174686)[0m                                  'ulysses_sequence_parallel_size': 1,
+[36m(TaskRunner pid=174686)[0m                                  'use_dynamic_bsz': True,
+[36m(TaskRunner pid=174686)[0m                                  'use_kl_loss': False,
+[36m(TaskRunner pid=174686)[0m                                  'use_torch_compile': True},
+[36m(TaskRunner pid=174686)[0m                        'adapt_think': {'adjust_old_logprobs': 0,
+[36m(TaskRunner pid=174686)[0m                                        'eot_token_id': 151649,
+[36m(TaskRunner pid=174686)[0m                                        'non_eot_token_id': 71486,
+[36m(TaskRunner pid=174686)[0m                                        'nothinking_max_response_length': 4096,
+[36m(TaskRunner pid=174686)[0m                                        'nothinking_ratio': 0.5},
+[36m(TaskRunner pid=174686)[0m                        'hybrid_engine': True,
+[36m(TaskRunner pid=174686)[0m                        'model': {'enable_gradient_checkpointing': True,
+[36m(TaskRunner pid=174686)[0m                                  'external_lib': None,
+[36m(TaskRunner pid=174686)[0m                                  'override_config': {},
+[36m(TaskRunner pid=174686)[0m                                  'path': '/home/aipmu/models/DeepSeek-R1-Distill-Qwen-1.5B',
+[36m(TaskRunner pid=174686)[0m                                  'use_remove_padding': True},
+[36m(TaskRunner pid=174686)[0m                        'ref': {'fsdp_config': {'param_offload': True,
+[36m(TaskRunner pid=174686)[0m                                                'wrap_policy': {'min_num_params': 0}},
+[36m(TaskRunner pid=174686)[0m                                'log_prob_max_token_len_per_gpu': 16384,
+[36m(TaskRunner pid=174686)[0m                                'log_prob_micro_batch_size': None,
+[36m(TaskRunner pid=174686)[0m                                'log_prob_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=174686)[0m                                'log_prob_use_dynamic_bsz': True,
+[36m(TaskRunner pid=174686)[0m                                'ulysses_sequence_parallel_size': 1},
+[36m(TaskRunner pid=174686)[0m                        'rollout': {'disable_log_stats': True,
+[36m(TaskRunner pid=174686)[0m                                    'do_sample': True,
+[36m(TaskRunner pid=174686)[0m                                    'dtype': 'bfloat16',
+[36m(TaskRunner pid=174686)[0m                                    'enable_chunked_prefill': True,
+[36m(TaskRunner pid=174686)[0m                                    'enforce_eager': True,
+[36m(TaskRunner pid=174686)[0m                                    'free_cache_engine': True,
+[36m(TaskRunner pid=174686)[0m                                    'gpu_memory_utilization': 0.9,
+[36m(TaskRunner pid=174686)[0m                                    'ignore_eos': False,
+[36m(TaskRunner pid=174686)[0m                                    'load_format': 'dummy_dtensor',
+[36m(TaskRunner pid=174686)[0m                                    'log_prob_max_token_len_per_gpu': 16384,
+[36m(TaskRunner pid=174686)[0m                                    'log_prob_micro_batch_size': None,
+[36m(TaskRunner pid=174686)[0m                                    'log_prob_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=174686)[0m                                    'log_prob_use_dynamic_bsz': True,
+[36m(TaskRunner pid=174686)[0m                                    'max_model_len': None,
+[36m(TaskRunner pid=174686)[0m                                    'max_num_batched_tokens': 24576,
+[36m(TaskRunner pid=174686)[0m                                    'max_num_seqs': 64,
+[36m(TaskRunner pid=174686)[0m                                    'n': 1,
+[36m(TaskRunner pid=174686)[0m                                    'name': 'vllm',
+[36m(TaskRunner pid=174686)[0m                                    'prompt_length': 4096,
+[36m(TaskRunner pid=174686)[0m                                    'response_length': 16384,
+[36m(TaskRunner pid=174686)[0m                                    'temperature': 1.0,
+[36m(TaskRunner pid=174686)[0m                                    'tensor_model_parallel_size': 1,
+[36m(TaskRunner pid=174686)[0m                                    'top_k': -1,
+[36m(TaskRunner pid=174686)[0m                                    'top_p': 1,
+[36m(TaskRunner pid=174686)[0m                                    'use_fire_sampling': False,
+[36m(TaskRunner pid=174686)[0m                                    'val_kwargs': {'do_sample': True,
+[36m(TaskRunner pid=174686)[0m                                                   'max_tokens': 16384,
+[36m(TaskRunner pid=174686)[0m                                                   'n': 1,
+[36m(TaskRunner pid=174686)[0m                                                   'temperature': 0.6,
+[36m(TaskRunner pid=174686)[0m                                                   'top_k': -1,
+[36m(TaskRunner pid=174686)[0m                                                   'top_p': 0.95}}},
+[36m(TaskRunner pid=174686)[0m  'algorithm': {'adv_estimator': 'naive',
+[36m(TaskRunner pid=174686)[0m                'gamma': 1.0,
+[36m(TaskRunner pid=174686)[0m                'kl_ctrl': {'horizon': 10000,
+[36m(TaskRunner pid=174686)[0m                            'kl_coef': 0.001,
+[36m(TaskRunner pid=174686)[0m                            'target_kl': 0.1,
+[36m(TaskRunner pid=174686)[0m                            'type': 'fixed'},
+[36m(TaskRunner pid=174686)[0m                'kl_penalty': 'kl',
+[36m(TaskRunner pid=174686)[0m                'lam': 1.0,
+[36m(TaskRunner pid=174686)[0m                'use_kl_in_reward': False},
+[36m(TaskRunner pid=174686)[0m  'critic': {'checkpoint': {'contents': ['model', 'optimizer', 'extra']},
+[36m(TaskRunner pid=174686)[0m             'cliprange_value': 0.5,
+[36m(TaskRunner pid=174686)[0m             'forward_max_token_len_per_gpu': 32768,
+[36m(TaskRunner pid=174686)[0m             'forward_micro_batch_size': None,
+[36m(TaskRunner pid=174686)[0m             'forward_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=174686)[0m             'grad_clip': 1.0,
+[36m(TaskRunner pid=174686)[0m             'model': {'enable_gradient_checkpointing': True,
+[36m(TaskRunner pid=174686)[0m                       'external_lib': None,
+[36m(TaskRunner pid=174686)[0m                       'fsdp_config': {'fsdp_size': -1,
+[36m(TaskRunner pid=174686)[0m                                       'optimizer_offload': False,
+[36m(TaskRunner pid=174686)[0m                                       'param_offload': False,
+[36m(TaskRunner pid=174686)[0m                                       'wrap_policy': {'min_num_params': 0}},
+[36m(TaskRunner pid=174686)[0m                       'override_config': {},
+[36m(TaskRunner pid=174686)[0m                       'path': '~/models/deepseek-llm-7b-chat',
+[36m(TaskRunner pid=174686)[0m                       'tokenizer_path': '/home/aipmu/models/DeepSeek-R1-Distill-Qwen-1.5B',
+[36m(TaskRunner pid=174686)[0m                       'use_remove_padding': False},
+[36m(TaskRunner pid=174686)[0m             'optim': {'lr': 1e-05,
+[36m(TaskRunner pid=174686)[0m                       'lr_warmup_steps_ratio': 0.0,
+[36m(TaskRunner pid=174686)[0m                       'min_lr_ratio': None,
+[36m(TaskRunner pid=174686)[0m                       'total_training_steps': -1,
+[36m(TaskRunner pid=174686)[0m                       'warmup_style': 'constant',
+[36m(TaskRunner pid=174686)[0m                       'weight_decay': 0.01},
+[36m(TaskRunner pid=174686)[0m             'ppo_epochs': 1,
+[36m(TaskRunner pid=174686)[0m             'ppo_max_token_len_per_gpu': 32768,
+[36m(TaskRunner pid=174686)[0m             'ppo_micro_batch_size': None,
+[36m(TaskRunner pid=174686)[0m             'ppo_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=174686)[0m             'ppo_mini_batch_size': 128,
+[36m(TaskRunner pid=174686)[0m             'rollout_n': 1,
+[36m(TaskRunner pid=174686)[0m             'shuffle': False,
+[36m(TaskRunner pid=174686)[0m             'strategy': 'fsdp',
+[36m(TaskRunner pid=174686)[0m             'ulysses_sequence_parallel_size': 1,
+[36m(TaskRunner pid=174686)[0m             'use_dynamic_bsz': True},
+[36m(TaskRunner pid=174686)[0m  'custom_reward_function': {'name': 'adapt_think_rm',
+[36m(TaskRunner pid=174686)[0m                             'path': './src/adapt_think_rm.py'},
+[36m(TaskRunner pid=174686)[0m  'data': {'custom_cls': {'name': None, 'path': None},
+[36m(TaskRunner pid=174686)[0m           'filter_overlong_prompts': False,
+[36m(TaskRunner pid=174686)[0m           'filter_overlong_prompts_workers': 1,
+[36m(TaskRunner pid=174686)[0m           'image_key': 'images',
+[36m(TaskRunner pid=174686)[0m           'max_prompt_length': 4096,
+[36m(TaskRunner pid=174686)[0m           'max_response_length': 16384,
+[36m(TaskRunner pid=174686)[0m           'prompt_key': 'prompt',
+[36m(TaskRunner pid=174686)[0m           'return_raw_chat': False,
+[36m(TaskRunner pid=174686)[0m           'return_raw_input_ids': False,
+[36m(TaskRunner pid=174686)[0m           'reward_fn_key': 'data_source',
+[36m(TaskRunner pid=174686)[0m           'shuffle': True,
+[36m(TaskRunner pid=174686)[0m           'tokenizer': None,
+[36m(TaskRunner pid=174686)[0m           'train_batch_size': 128,
+[36m(TaskRunner pid=174686)[0m           'train_files': './data/train/preprocessed_data/deepscaler.parquet',
+[36m(TaskRunner pid=174686)[0m           'truncation': 'error',
+[36m(TaskRunner pid=174686)[0m           'val_batch_size': 128,
+[36m(TaskRunner pid=174686)[0m           'val_files': ['./data/test/preprocessed_data/aime*16.parquet']},
+[36m(TaskRunner pid=174686)[0m  'reward_model': {'enable': False,
+[36m(TaskRunner pid=174686)[0m                   'forward_max_token_len_per_gpu': 32768,
+[36m(TaskRunner pid=174686)[0m                   'max_length': None,
+[36m(TaskRunner pid=174686)[0m                   'micro_batch_size': None,
+[36m(TaskRunner pid=174686)[0m                   'micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=174686)[0m                   'model': {'external_lib': None,
+[36m(TaskRunner pid=174686)[0m                             'fsdp_config': {'fsdp_size': -1,
+[36m(TaskRunner pid=174686)[0m                                             'param_offload': False,
+[36m(TaskRunner pid=174686)[0m                                             'wrap_policy': {'min_num_params': 0}},
+[36m(TaskRunner pid=174686)[0m                             'input_tokenizer': '/home/aipmu/models/DeepSeek-R1-Distill-Qwen-1.5B',
+[36m(TaskRunner pid=174686)[0m                             'path': '~/models/FsfairX-LLaMA3-RM-v0.1',
+[36m(TaskRunner pid=174686)[0m                             'use_remove_padding': False},
+[36m(TaskRunner pid=174686)[0m                   'reward_kwargs': {'nothinking_bonus': 0,
+[36m(TaskRunner pid=174686)[0m                                     'ref_result_file': None},
+[36m(TaskRunner pid=174686)[0m                   'reward_manager': 'adapt_think',
+[36m(TaskRunner pid=174686)[0m                   'strategy': 'fsdp',
+[36m(TaskRunner pid=174686)[0m                   'ulysses_sequence_parallel_size': 1,
+[36m(TaskRunner pid=174686)[0m                   'use_dynamic_bsz': True},
+[36m(TaskRunner pid=174686)[0m  'trainer': {'balance_batch': True,
+[36m(TaskRunner pid=174686)[0m              'critic_warmup': 0,
+[36m(TaskRunner pid=174686)[0m              'default_hdfs_dir': None,
+[36m(TaskRunner pid=174686)[0m              'default_local_dir': '/home/aipmu/AdaptThink/outputs/DeepSeek-R1-Distill-Qwen-1.5B',
+[36m(TaskRunner pid=174686)[0m              'del_local_ckpt_after_load': False,
+[36m(TaskRunner pid=174686)[0m              'experiment_name': 'eval-aime_16-len16384-n1-DeepSeek-R1-Distill-Qwen-1.5B',
+[36m(TaskRunner pid=174686)[0m              'log_val_generations': 0,
+[36m(TaskRunner pid=174686)[0m              'logger': ['console'],
+[36m(TaskRunner pid=174686)[0m              'max_actor_ckpt_to_keep': None,
+[36m(TaskRunner pid=174686)[0m              'max_critic_ckpt_to_keep': None,
+[36m(TaskRunner pid=174686)[0m              'n_gpus_per_node': 1,
+[36m(TaskRunner pid=174686)[0m              'nnodes': 1,
+[36m(TaskRunner pid=174686)[0m              'project_name': 'adapt_think_verl-eval',
+[36m(TaskRunner pid=174686)[0m              'ray_wait_register_center_timeout': 300,
+[36m(TaskRunner pid=174686)[0m              'resume_from_path': None,
+[36m(TaskRunner pid=174686)[0m              'resume_mode': 'auto',
+[36m(TaskRunner pid=174686)[0m              'save_freq': -1,
+[36m(TaskRunner pid=174686)[0m              'test_freq': -1,
+[36m(TaskRunner pid=174686)[0m              'total_epochs': 30,
+[36m(TaskRunner pid=174686)[0m              'total_training_steps': None,
+[36m(TaskRunner pid=174686)[0m              'val_before_train': True,
+[36m(TaskRunner pid=174686)[0m              'val_only': True,
+[36m(TaskRunner pid=174686)[0m              'val_result_save_dir': '/home/aipmu/AdaptThink/outputs/DeepSeek-R1-Distill-Qwen-1.5B/eval_results_aime_16_len16384_n1'}}
+[36m(TaskRunner pid=174686)[0m Generating train split: 0 examples [00:00, ? examples/s]Generating train split: 480 examples [00:00, 23228.56 examples/s]
+[36m(TaskRunner pid=174686)[0m DeprecationWarning: `ray.state.available_resources_per_node` is a private attribute and access will be removed in a future Ray version.
+[36m(TaskRunner pid=174686)[0m WARNING:2026-11-12 15:00:22,770:Waiting for register center actor HLSrxo_register_center to be ready. Elapsed time: 0 seconds out of 300 seconds.
+[36m(WorkerDict pid=174849)[0m Flash Attention 2.0 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen2ForCausalLM is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `torch_dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", torch_dtype=torch.float16)`
+[36m(WorkerDict pid=174849)[0m You are attempting to use Flash Attention 2.0 with a model not initialized on GPU. Make sure to move the model to GPU after initializing it on CPU with `model.to('cuda')`.
+[36m(WorkerDict pid=174849)[0m [rank0]:[W1112 15:00:49.177786153 ProcessGroupNCCL.cpp:4561] [PG ID 0 PG GUID 0 Rank 0]  using GPU 0 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect. Specify device_ids in barrier() to force use of a particular device, or call init_process_group() with a device_id.
+[36m(WorkerDict pid=174849)[0m /home/aipmu/miniconda3/envs/adapt_think/lib/python3.10/site-packages/torch/distributed/fsdp/_init_utils.py:444: UserWarning: FSDP is switching to use `NO_SHARD` instead of ShardingStrategy.FULL_SHARD since the world size is 1.
+[36m(WorkerDict pid=174849)[0m   warnings.warn(
+[36m(WorkerDict pid=174849)[0m /home/aipmu/miniconda3/envs/adapt_think/lib/python3.10/site-packages/torch/distributed/fsdp/fully_sharded_data_parallel.py:690: FutureWarning: FSDP.state_dict_type() and FSDP.set_state_dict_type() are being deprecated. Please use APIs, get_state_dict() and set_state_dict(), which can support different parallelisms, FSDP1, FSDP2, DDP. API doc: https://pytorch.org/docs/stable/distributed.checkpoint.html#torch.distributed.checkpoint.state_dict.get_state_dict .Tutorial: https://pytorch.org/tutorials/recipes/distributed_checkpoint_recipe.html .
+[36m(WorkerDict pid=174849)[0m   warnings.warn(
+[36m(WorkerDict pid=174849)[0m /home/aipmu/miniconda3/envs/adapt_think/lib/python3.10/site-packages/torch/distributed/fsdp/_state_dict_utils.py:773: UserWarning: When using ``NO_SHARD`` for ``ShardingStrategy``, full_state_dict willbe returned.
+[36m(WorkerDict pid=174849)[0m   warnings.warn(
+[36m(WorkerDict pid=174849)[0m /home/aipmu/miniconda3/envs/adapt_think/lib/python3.10/site-packages/torch/distributed/fsdp/_state_dict_utils.py:711: UserWarning: When using ``NO_SHARD`` for ``ShardingStrategy``, full_state_dict willbe returned.
+[36m(WorkerDict pid=174849)[0m   warnings.warn(
+[36m(TaskRunner pid=174686)[0m using customized reward function 'adapt_think_rm' from './src/adapt_think_rm.py'
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m NOTHINKING BONUS: 0
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m WARNING: val_batch_size is deprecated. Validation datasets are sent to inference engines as a whole batch, which will schedule the memory themselves.
+[36m(TaskRunner pid=174686)[0m [validate_config] All configuration checks passed successfully!
+[36m(TaskRunner pid=174686)[0m dataset len: 40315
+[36m(TaskRunner pid=174686)[0m dataset len: 480
+[36m(TaskRunner pid=174686)[0m Size of train dataloader: 314
+[36m(TaskRunner pid=174686)[0m Total training steps: 9420
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m ADV_ESTIMATOR: naive
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 
+[36m(WorkerDict pid=174849)[0m Model config after override: Qwen2Config {
+[36m(WorkerDict pid=174849)[0m   "architectures": [
+[36m(WorkerDict pid=174849)[0m     "Qwen2ForCausalLM"
+[36m(WorkerDict pid=174849)[0m   ],
+[36m(WorkerDict pid=174849)[0m   "attention_dropout": 0.0,
+[36m(WorkerDict pid=174849)[0m   "bos_token_id": 151646,
+[36m(WorkerDict pid=174849)[0m   "eos_token_id": 151643,
+[36m(WorkerDict pid=174849)[0m   "hidden_act": "silu",
+[36m(WorkerDict pid=174849)[0m   "hidden_size": 1536,
+[36m(WorkerDict pid=174849)[0m   "initializer_range": 0.02,
+[36m(WorkerDict pid=174849)[0m   "intermediate_size": 8960,
+[36m(WorkerDict pid=174849)[0m   "max_position_embeddings": 131072,
+[36m(WorkerDict pid=174849)[0m   "max_window_layers": 21,
+[36m(WorkerDict pid=174849)[0m   "model_type": "qwen2",
+[36m(WorkerDict pid=174849)[0m   "num_attention_heads": 12,
+[36m(WorkerDict pid=174849)[0m   "num_hidden_layers": 28,
+[36m(WorkerDict pid=174849)[0m   "num_key_value_heads": 2,
+[36m(WorkerDict pid=174849)[0m   "pad_token_id": 151643,
+[36m(WorkerDict pid=174849)[0m   "rms_norm_eps": 1e-06,
+[36m(WorkerDict pid=174849)[0m   "rope_scaling": null,
+[36m(WorkerDict pid=174849)[0m   "rope_theta": 10000,
+[36m(WorkerDict pid=174849)[0m   "sliding_window": 4096,
+[36m(WorkerDict pid=174849)[0m   "tie_word_embeddings": false,
+[36m(WorkerDict pid=174849)[0m   "torch_dtype": "bfloat16",
+[36m(WorkerDict pid=174849)[0m   "transformers_version": "4.51.2",
+[36m(WorkerDict pid=174849)[0m   "use_cache": true,
+[36m(WorkerDict pid=174849)[0m   "use_mrope": false,
+[36m(WorkerDict pid=174849)[0m   "use_sliding_window": false,
+[36m(WorkerDict pid=174849)[0m   "vocab_size": 151936
+[36m(WorkerDict pid=174849)[0m }
+[36m(WorkerDict pid=174849)[0m 
+[36m(WorkerDict pid=174849)[0m Monkey patch _flash_attention_forward in transformers.integrations.flash_attention
+[36m(WorkerDict pid=174849)[0m NCCL version 2.21.5+cuda12.4
+[36m(WorkerDict pid=174849)[0m Qwen2ForCausalLM contains 1.78B parameters
+[36m(WorkerDict pid=174849)[0m wrap_policy: functools.partial(<function _or_policy at 0x75abc88312d0>, policies=[functools.partial(<function transformer_auto_wrap_policy at 0x75abc88311b0>, transformer_layer_cls={<class 'transformers.models.qwen2.modeling_qwen2.Qwen2DecoderLayer'>})])
+[36m(WorkerDict pid=174849)[0m Total steps: 9420, num_warmup_steps: 0
+[36m(WorkerDict pid=174849)[0m Actor use_remove_padding=True
+[36m(WorkerDict pid=174849)[0m Before building vllm rollout, memory allocated (GB): 6.620169639587402, memory reserved (GB): 10.345703125
+[36m(WorkerDict pid=174849)[0m WARNING 11-12 15:00:59 [cuda.py:95] To see benefits of async output processing, enable CUDA graph. Since, enforce-eager is enabled, async output processor cannot be used
+[36m(WorkerDict pid=174849)[0m WARNING 11-12 15:01:00 [utils.py:2321] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x75ab515a8130>
+[36m(WorkerDict pid=174849)[0m WARNING 11-12 15:01:00 [interface.py:303] Using 'pin_memory=False' as WSL is detected. This may slow down the performance.
+[36m(WorkerDict pid=174849)[0m WARNING 11-12 15:01:01 [topk_topp_sampler.py:63] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+[36m(TaskRunner pid=174686)[0m Using LocalLogger is deprecated. The constructor API will change 
+[36m(TaskRunner pid=174686)[0m Checkpoint tracker file does not exist: %s /home/aipmu/AdaptThink/outputs/DeepSeek-R1-Distill-Qwen-1.5B/latest_checkpointed_iteration.txt
+[36m(TaskRunner pid=174686)[0m Training from scratch
+[36m(WorkerDict pid=174849)[0m kwargs: {'n': 1, 'logprobs': 0, 'max_tokens': 16384, 'detokenize': False, 'temperature': 1.0, 'top_k': -1, 'top_p': 1, 'ignore_eos': False}
+[36m(WorkerDict pid=174849)[0m After building vllm rollout, memory allocated (GB): 10.987031936645508, memory reserved (GB): 16.798828125
+[36m(WorkerDict pid=174849)[0m After building sharding manager, memory allocated (GB): 10.987031936645508, memory reserved (GB): 16.798828125
+[36m(TaskRunner pid=174686)[0m test_gen_batch meta info: {'eos_token_id': 151643, 'pad_token_id': 151643, 'recompute_log_prob': False, 'do_sample': True, 'validate': True}
+[36m(TaskRunner pid=174686)[0m validation generation end
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m [data_source]source_aime_thinking
+[36m(TaskRunner pid=174686)[0m [prompt] <｜User｜>Every morning Aya goes for a $9$-kilometer-long walk and stops at a coffee shop afterwards. When she walks at a constant speed of $s$ kilometers per hour, the walk takes her 4 hours, including $t$ minutes spent in the coffee shop. When she walks $s+2$ kilometers per hour, the walk takes her 2 hours and 24 minutes, including $t$ minutes spent in the coffee shop. Suppose Aya walks at $s+\frac{1}{2}$ kilometers per hour. Find the number of minutes the walk takes her, including the $t$ minutes spent in the coffee shop.<｜Assistant｜><think>
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m [response] Okay, so I need to solve this problem about Aya's walk and coffee shop. Let me try to understand what's given and what's being asked.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m First, Aya walks 9 kilometers every morning. Depending on her speed, the total time she takes includes both walking and the time she spends in the coffee shop. The problem gives two scenarios:
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 1. When she walks at a speed of s km/h, it takes her 4 hours, which includes t minutes in the coffee shop.
+[36m(TaskRunner pid=174686)[0m 2. When she increases her speed to s + 2 km/h, the total time becomes 2 hours and 24 minutes, still including t minutes in the coffee shop.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m We need to find the time it would take her if she walks at s + 1/2 km/h, again including t minutes in the coffee shop.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Let me break this down step by step.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m First, let's denote the time she spends walking as t_w and the time spent in the coffee shop as t_c (which is given as t minutes in both scenarios). So, the total time for each walk is t_w + t_c.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m In the first scenario:
+[36m(TaskRunner pid=174686)[0m - Distance walked: 9 km
+[36m(TaskRunner pid=174686)[0m - Speed: s km/h
+[36m(TaskRunner pid=174686)[0m - Total time: 4 hours (which is 4*60 = 240 minutes)
+[36m(TaskRunner pid=174686)[0m - So, total time = walking time + coffee shop time
+[36m(TaskRunner pid=174686)[0m   240 minutes = t_w + t
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m In the second scenario:
+[36m(TaskRunner pid=174686)[0m - Speed: s + 2 km/h
+[36m(TaskRunner pid=174686)[0m - Total time: 2 hours and 24 minutes, which is 2*60 + 24 = 144 minutes
+[36m(TaskRunner pid=174686)[0m - So, 144 minutes = t_w + t
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m We can set up two equations here.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m From the first scenario:
+[36m(TaskRunner pid=174686)[0m t_w + t = 240  ...(1)
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m From the second scenario:
+[36m(TaskRunner pid=174686)[0m t_w + t = 144  ...(2)
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, that can't be right. If she walks faster, the total time should be less, right? So, if she walks faster, the total time should be less than 240 minutes. But in the second scenario, the total time is 144 minutes, which is less than 240. So, that makes sense because she spends less time in the coffee shop.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, but the problem says t is the same in both scenarios. So, both times include the same t minutes in the coffee shop.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, but in the first scenario, total time is 240 = t_w + t, and in the second scenario, total time is 144 = t_w + t. But that would mean t_w + t is both 240 and 144, which is impossible. So, I must have misinterpreted something.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, perhaps t is the time she spends in the coffee shop, but the total time includes t minutes in the coffee shop, but maybe t is the same in both cases. But that would mean the same t is being added to t_w, which is different in each scenario.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, but in both cases, t is the same, so t_w + t is 240 in the first case and t_w + t is 144 in the second case. That can't be unless t_w is different, which it isn't. So, perhaps I have the wrong equation.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, maybe I need to think differently. Let me define t_w as the walking time, which depends on her speed. So, in the first case, when she walks at speed s km/h, the time she spends walking is t_w1 = 9 / s hours. The total time is t_w1 + t = 240 minutes. Similarly, when she walks at s + 2 km/h, her walking time is t_w2 = 9 / (s + 2) hours, and the total time is t_w2 + t = 144 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, that gives us two equations:
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 1. (9 / s) + t = 240  ...(1)
+[36m(TaskRunner pid=174686)[0m 2. (9 / (s + 2)) + t = 144  ...(2)
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m We can solve these two equations to find s and t.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Let me subtract equation (2) from equation (1) to eliminate t.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m (9/s + t) - (9/(s + 2) + t) = 240 - 144
+[36m(TaskRunner pid=174686)[0m 9/s - 9/(s + 2) = 96
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Factor out 9:
+[36m(TaskRunner pid=174686)[0m 9*(1/s - 1/(s + 2)) = 96
+[36m(TaskRunner pid=174686)[0m Divide both sides by 9:
+[36m(TaskRunner pid=174686)[0m 1/s - 1/(s + 2) = 96/9 = 32/3
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Let me compute 1/s - 1/(s + 2):
+[36m(TaskRunner pid=174686)[0m = ( (s + 2) - s ) / (s(s + 2)) )
+[36m(TaskRunner pid=174686)[0m = 2 / (s(s + 2))
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, 2/(s(s + 2)) = 32/3
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Cross-multiplying:
+[36m(TaskRunner pid=174686)[0m 2 * 3 = 32 * s(s + 2)
+[36m(TaskRunner pid=174686)[0m 6 = 32s^2 + 64s
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Bring all terms to one side:
+[36m(TaskRunner pid=174686)[0m 32s^2 + 64s - 6 = 0
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m We can simplify this equation by dividing all terms by 2:
+[36m(TaskRunner pid=174686)[0m 16s^2 + 32s - 3 = 0
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Now, we have a quadratic equation: 16s^2 + 32s - 3 = 0
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Let me use the quadratic formula:
+[36m(TaskRunner pid=174686)[0m s = [-b ± sqrt(b^2 - 4ac)] / (2a)
+[36m(TaskRunner pid=174686)[0m Where a = 16, b = 32, c = -3
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Compute discriminant:
+[36m(TaskRunner pid=174686)[0m D = 32^2 - 4*16*(-3) = 1024 + 192 = 1216
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m sqrt(1216): Let's compute that. 1216 divided by 16 is 76. So sqrt(1216) = 4*sqrt(76). Hmm, 76 is 4*19, so sqrt(76) = 2*sqrt(19). So sqrt(1216) = 4*2*sqrt(19) = 8*sqrt(19). Wait, but maybe I can compute it differently.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, maybe 1216 = 16*76, so sqrt(16*76) = 4*sqrt(76). So, sqrt(76) is approximately 8.72, so 4*8.72 ≈ 34.88. But maybe we can keep it symbolic.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, s = [ -32 ± 34.88 ] / (2*16) = [ -32 ± 34.88 ] / 32
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m We can ignore the negative solution because speed can't be negative. So,
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m s = (-32 + 34.88)/32 ≈ (2.88)/32 ≈ 0.09 km/h. Wait, that seems too low because walking speed is typically more than 5 km/h, right? So, maybe I made a mistake in the calculation.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, let me check my steps again.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, when I subtracted the two equations:
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 9/s + t = 240
+[36m(TaskRunner pid=174686)[0m 9/(s + 2) + t = 144
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Subtracting, I get:
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 9/s - 9/(s + 2) = 96
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Then, 9*(1/s - 1/(s + 2)) = 96
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Which becomes 1/s - 1/(s + 2) = 96/9 = 32/3.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Then, 1/s - 1/(s + 2) = (s + 2 - s)/(s(s + 2)) = 2/(s(s + 2)) = 32/3
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, 2/(s(s + 2)) = 32/3
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Then, 2*3 = 32*s(s + 2) → 6 = 32s^2 + 64s
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Divide by 2: 3 = 16s^2 + 32s
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, 16s^2 + 32s - 3 = 0
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m That's correct.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Now, solving 16s^2 + 32s - 3 = 0
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Quadratic formula:
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m s = [-32 ± sqrt(32^2 - 4*16*(-3))]/(2*16)
+[36m(TaskRunner pid=174686)[0m = [-32 ± sqrt(1024 + 192)]/32
+[36m(TaskRunner pid=174686)[0m = [-32 ± sqrt(1216)]/32
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m sqrt(1216) = sqrt(16*76) = 4*sqrt(76)
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m sqrt(76) is approximately 8.72, so 4*8.72 ≈ 34.88
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Thus, s ≈ (-32 + 34.88)/32 ≈ 2.88/32 ≈ 0.09 km/h
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, that seems too low for a walking speed. Maybe I made a mistake in the setup.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, let me double-check the setup.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, if she walks at s km/h, the time taken is 9/s hours, which is correct. The total time is 240 minutes, which is 4 hours. So, 9/s + t = 240.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Similarly, at s + 2 km/h, time is 9/(s + 2) hours, so total time is 144 minutes, which is 2 hours and 24 minutes. So, 9/(s + 2) + t = 144.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, subtracting, 9/s - 9/(s + 2) = 96 minutes, which is 1.6 hours. Wait, 240 - 144 = 96 minutes, which is 1.6 hours.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, that's correct. So, 9/s - 9/(s + 2) = 1.6
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, 9*(1/s - 1/(s + 2)) = 1.6
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 1/s - 1/(s + 2) = 1.6 / 9 ≈ 0.1778
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, 1.6 is 8/5, so 1.6/9 = 8/(5*9) = 8/45 ≈ 0.1778.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, so 1/s - 1/(s + 2) = 8/45
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, 1/s - 1/(s + 2) = 8/45
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Which is equal to (s + 2 - s)/(s(s + 2)) = 2/(s(s + 2)) = 8/45
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, 2/(s(s + 2)) = 8/45
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Cross-multiplying: 2*45 = 8*s(s + 2)
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, 90 = 8s^2 + 16s
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Bring all terms to one side: 8s^2 + 16s - 90 = 0
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Divide all terms by 2: 4s^2 + 8s - 45 = 0
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Now, using quadratic formula:
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m s = [-8 ± sqrt(8^2 - 4*4*(-45))]/(2*4)
+[36m(TaskRunner pid=174686)[0m = [-8 ± sqrt(64 + 720)]/8
+[36m(TaskRunner pid=174686)[0m = [-8 ± sqrt(784)]/8
+[36m(TaskRunner pid=174686)[0m = [-8 ± 28]/8
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Since speed can't be negative, we take the positive solution:
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m s = (-8 + 28)/8 = 20/8 = 2.5 km/h
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Ah, that's better, 2.5 km/h, which makes sense.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, s = 2.5 km/h.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Now, let's find t.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m From equation (1): t = 240 - 9/s = 240 - 9/2.5
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 9 divided by 2.5 is 3.6, so t = 240 - 3.6 = 236.4 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, that seems a lot of time, but let's check.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Alternatively, from equation (2): t = 144 - 9/(s + 2) = 144 - 9/(2.5 + 2) = 144 - 9/4.5
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 9 divided by 4.5 is 2, so t = 144 - 2 = 142 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, that's a discrepancy because t should be the same in both equations.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, that can't be. So, perhaps I made a mistake in the setup.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, let me double-check.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, if s = 2.5 km/h, then at 2.5 km/h, the time taken is 9/2.5 = 3.6 hours, which is 216 minutes. So, total time is 216 + t = 240, so t = 24 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, that's different. So, t = 24 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, but when she walks faster, at 4.5 km/h, the time taken is 9/4.5 = 2 hours, which is 120 minutes, so total time is 120 + t = 144, so t = 24 minutes. So, that's consistent.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, t is 24 minutes, which is consistent in both scenarios.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, s = 2.5 km/h, t = 24 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Now, the problem says: Suppose Aya walks at s + 1/2 km/h, which is 2.5 + 0.5 = 3 km/h. So, her walking speed is 3 km/h.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m We need to find the total time, which is walking time plus t minutes in the coffee shop.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Walking time is 9 / 3 = 3 hours, which is 180 minutes. So, total time is 180 + 24 = 204 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, but let me make sure.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, t is the time she spends in the coffee shop, which is 24 minutes, regardless of her walking speed. So, when she walks faster, the time in the coffee shop remains 24 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, yes, at 3 km/h, walking time is 180 minutes, plus 24 minutes in the shop, total 204 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, that seems straightforward, but let me check the calculations again.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m s = 2.5 km/h, t = 24 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m At 3 km/h, walking time is 9 / 3 = 3 hours = 180 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Plus 24 minutes in the shop: 180 + 24 = 204 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, the answer should be 204 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, but let me ensure that I didn't make any mistakes earlier.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Earlier, I thought s was 0.09, which was wrong, but after rechecking, s is 2.5 km/h, which makes sense because when she walks faster, the time in the shop remains 24 minutes, which is consistent.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, the final answer is 204 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Wait, but let me also check if 204 minutes is correct. Let me compute the total time when she walks at 3 km/h.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Walking time: 9 km / 3 km/h = 3 hours = 180 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Plus coffee shop time: 24 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Total: 180 + 24 = 204 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Yes, that seems correct.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m So, I think the answer is 204 minutes.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m **Final Answer**
+[36m(TaskRunner pid=174686)[0m The number of minutes the walk takes her, including the $t$ minutes spent in the coffee shop, is \boxed{204}.
+[36m(TaskRunner pid=174686)[0m </think>
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Aya walks 9 kilometers every morning. Depending on her speed, the total time she takes includes both walking and the time she spends in the coffee shop. We need to find the time it would take her if she walks at \( s + \frac{1}{2} \) km/h, including \( t \) minutes in the coffee shop.
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m First, we set up the equations based on the given scenarios:
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 1. When she walks at \( s \) km/h, the total time is 4 hours (240 minutes):
+[36m(TaskRunner pid=174686)[0m    \[
+[36m(TaskRunner pid=174686)[0m    \frac{9}{s} + t = 240
+[36m(TaskRunner pid=174686)[0m    \]
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 2. When she walks at \( s + 2 \) km/h, the total time is 2 hours and 24 minutes (144 minutes):
+[36m(TaskRunner pid=174686)[0m    \[
+[36m(TaskRunner pid=174686)[0m    \frac{9}{s + 2} + t = 144
+[36m(TaskRunner pid=174686)[0m    \]
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Subtracting the second equation from the first to eliminate \( t \):
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m \frac{9}{s} - \frac{9}{s + 2} = 96
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m 9 \left( \frac{1}{s} - \frac{1}{s + 2} \right) = 96
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m \frac{9}{s(s + 2)} = \frac{96}{9}
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m \frac{2}{s(s + 2)} = \frac{32}{3}
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m 2 \times 3 = 32s(s + 2)
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m 6 = 32s^2 + 64s
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m 16s^2 + 32s - 3 = 0
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Solving this quadratic equation using the quadratic formula:
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m s = \frac{-32 \pm \sqrt{32^2 - 4 \cdot 16 \cdot (-3)}}{2 \cdot 16}
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m s = \frac{-32 \pm \sqrt{1024 + 192}}{32}
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m s = \frac{-32 \pm 34.88}{32}
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m Taking the positive solution:
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m s = \frac{-32 + 34.88}{32} \approx 0.09 \text{ (incorrect, rechecking shows correct value is 2.5 km/h)}
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Rechecking with correct value \( s = 2.5 \) km/h:
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m t = 240 - \frac{9}{2.5} = 240 - 3.6 = 236.4 \text{ (incorrect, correct value is 24 minutes)}
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m Correct value of \( t \) is 24 minutes. Now, walking at \( s + \frac{1}{2} = 3 \) km/h:
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m \text{Walking time} = \frac{9}{3} = 3 \text{ hours} = 180 \text{ minutes}
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m \[
+[36m(TaskRunner pid=174686)[0m \text{Total time} = 180 + 24 = 204 \text{ minutes}
+[36m(TaskRunner pid=174686)[0m \]
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m The number of minutes the walk takes her, including the \( t \) minutes spent in the coffee shop, is \boxed{204}.
+[36m(TaskRunner pid=174686)[0m [ground_truth] 204
+[36m(TaskRunner pid=174686)[0m [score] 1
+[36m(TaskRunner pid=174686)[0m [acc] 1
+[36m(TaskRunner pid=174686)[0m [pred] 204
+[36m(TaskRunner pid=174686)[0m [response_length] 4268
+[36m(TaskRunner pid=174686)[0m [ground_truth] 204
+[36m(TaskRunner pid=174686)[0m [enforce_nothinking] False
+[36m(TaskRunner pid=174686)[0m [is_nothinking] False
+[36m(TaskRunner pid=174686)[0m [nothinking_response_length] None
+[36m(TaskRunner pid=174686)[0m [nothinking_acc] None
+[36m(TaskRunner pid=174686)[0m [thinking_response_length] 4268
+[36m(TaskRunner pid=174686)[0m [thinking_acc] 1
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m SAVE PREDICTION in: /home/aipmu/AdaptThink/outputs/DeepSeek-R1-Distill-Qwen-1.5B/eval_results_aime_16_len16384_n1
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m 
+[36m(TaskRunner pid=174686)[0m ("Initial validation metrics: {'val-aux/aime/reward/mean@16': 0.29375, "
+[36m(TaskRunner pid=174686)[0m  "'val-aux/aime/score/mean@16': 0.29375, 'val-aux/aime/acc/mean@16': 0.29375, "
+[36m(TaskRunner pid=174686)[0m  "'val-aux/aime/response_length/mean@16': 12241.835416666667, "
+[36m(TaskRunner pid=174686)[0m  "'val-aux/aime/enforce_nothinking/mean@16': 0.0, "
+[36m(TaskRunner pid=174686)[0m  "'val-aux/aime/is_nothinking/mean@16': 0.0, "
+[36m(TaskRunner pid=174686)[0m  "'val-aux/aime/thinking_response_length/mean@16': 12241.835416666667, "
+[36m(TaskRunner pid=174686)[0m  "'val-aux/aime/thinking_acc/mean@16': 0.29375}")
+[36m(TaskRunner pid=174686)[0m step:0 - val-aux/aime/reward/mean@16:0.294 - val-aux/aime/score/mean@16:0.294 - val-aux/aime/acc/mean@16:0.294 - val-aux/aime/response_length/mean@16:12241.835 - val-aux/aime/enforce_nothinking/mean@16:0.000 - val-aux/aime/is_nothinking/mean@16:0.000 - val-aux/aime/thinking_response_length/mean@16:12241.835 - val-aux/aime/thinking_acc/mean@16:0.294
++ for MODEL_PATH in "${MODEL_PATH_LIST[@]}"
++ NAME=AdaptThink-1.5B-delta0.05
++ CKPT_DIR=/home/aipmu/AdaptThink/outputs/AdaptThink-1.5B-delta0.05
+++ echo 'aime*16'
+++ tr ' *' __
++ TAG=aime_16
++ RESULT_SAVE_DIR=/home/aipmu/AdaptThink/outputs/AdaptThink-1.5B-delta0.05/eval_results_aime_16_len16384_n1
++ EXP_NAME=eval-aime_16-len16384-n1-AdaptThink-1.5B-delta0.05
++ echo 'EVAL MODEL: /home/aipmu/models/AdaptThink-1.5B-delta0.05'
+EVAL MODEL: /home/aipmu/models/AdaptThink-1.5B-delta0.05
++ python3 -m src.main_ppo algorithm.adv_estimator=naive reward_model.reward_manager=adapt_think data.train_files=./data/train/preprocessed_data/deepscaler.parquet 'data.val_files=['\''./data/test/preprocessed_data/aime*16.parquet'\'']' data.train_batch_size=128 data.val_batch_size=128 data.max_prompt_length=4096 data.max_response_length=16384 actor_rollout_ref.adapt_think.eot_token_id=151649 actor_rollout_ref.adapt_think.non_eot_token_id=71486 actor_rollout_ref.model.path=/home/aipmu/models/AdaptThink-1.5B-delta0.05 actor_rollout_ref.model.use_remove_padding=True actor_rollout_ref.actor.ppo_mini_batch_size=128 actor_rollout_ref.actor.use_dynamic_bsz=True actor_rollout_ref.actor.fsdp_config.param_offload=True actor_rollout_ref.actor.fsdp_config.optimizer_offload=True actor_rollout_ref.ref.fsdp_config.param_offload=True actor_rollout_ref.rollout.tensor_model_parallel_size=1 actor_rollout_ref.rollout.name=vllm actor_rollout_ref.rollout.gpu_memory_utilization=0.9 actor_rollout_ref.rollout.max_num_seqs=64 actor_rollout_ref.rollout.val_kwargs.do_sample=True actor_rollout_ref.rollout.val_kwargs.n=1 actor_rollout_ref.rollout.val_kwargs.temperature=0.6 actor_rollout_ref.rollout.val_kwargs.top_p=0.95 actor_rollout_ref.rollout.max_num_batched_tokens=24576 actor_rollout_ref.rollout.enable_chunked_prefill=True 'trainer.logger=[console]' trainer.project_name=adapt_think_verl-eval trainer.experiment_name=eval-aime_16-len16384-n1-AdaptThink-1.5B-delta0.05 trainer.val_before_train=True +trainer.val_only=True +trainer.val_result_save_dir=/home/aipmu/AdaptThink/outputs/AdaptThink-1.5B-delta0.05/eval_results_aime_16_len16384_n1 trainer.n_gpus_per_node=1 trainer.nnodes=1 trainer.default_local_dir=/home/aipmu/AdaptThink/outputs/AdaptThink-1.5B-delta0.05 custom_reward_function.path=./src/adapt_think_rm.py custom_reward_function.name=adapt_think_rm
+2026-11-12 21:47:54,520	WARNING authentication_token_setup.py:85 -- Token authentication is enabled for this Ray cluster. Set RAY_AUTH_MODE=disabled to opt out. For more information, see https://docs.ray.io/en/latest/ray-security/token-auth.html
+2026-11-12 21:47:57,711	INFO worker.py:2029 -- Started a local Ray instance. View the dashboard at [1m[32m127.0.0.1:8265 [39m[22m
+[36m(TaskRunner pid=411293)[0m {'actor_rollout_ref': {'actor': {'checkpoint': {'contents': ['model',
+[36m(TaskRunner pid=411293)[0m                                                              'optimizer',
+[36m(TaskRunner pid=411293)[0m                                                              'extra']},
+[36m(TaskRunner pid=411293)[0m                                  'clip_ratio': 0.2,
+[36m(TaskRunner pid=411293)[0m                                  'clip_ratio_c': 3.0,
+[36m(TaskRunner pid=411293)[0m                                  'clip_ratio_high': 0.2,
+[36m(TaskRunner pid=411293)[0m                                  'clip_ratio_low': 0.2,
+[36m(TaskRunner pid=411293)[0m                                  'entropy_coeff': 0.001,
+[36m(TaskRunner pid=411293)[0m                                  'fsdp_config': {'fsdp_size': -1,
+[36m(TaskRunner pid=411293)[0m                                                  'optimizer_offload': True,
+[36m(TaskRunner pid=411293)[0m                                                  'param_offload': True,
+[36m(TaskRunner pid=411293)[0m                                                  'wrap_policy': {'min_num_params': 0}},
+[36m(TaskRunner pid=411293)[0m                                  'grad_clip': 1.0,
+[36m(TaskRunner pid=411293)[0m                                  'kl_loss_coef': 0.001,
+[36m(TaskRunner pid=411293)[0m                                  'kl_loss_type': 'low_var_kl',
+[36m(TaskRunner pid=411293)[0m                                  'loss_agg_mode': 'token-mean',
+[36m(TaskRunner pid=411293)[0m                                  'optim': {'lr': 1e-06,
+[36m(TaskRunner pid=411293)[0m                                            'lr_warmup_steps': -1,
+[36m(TaskRunner pid=411293)[0m                                            'lr_warmup_steps_ratio': 0.0,
+[36m(TaskRunner pid=411293)[0m                                            'min_lr_ratio': None,
+[36m(TaskRunner pid=411293)[0m                                            'total_training_steps': -1,
+[36m(TaskRunner pid=411293)[0m                                            'warmup_style': 'constant',
+[36m(TaskRunner pid=411293)[0m                                            'weight_decay': 0.01},
+[36m(TaskRunner pid=411293)[0m                                  'ppo_epochs': 1,
+[36m(TaskRunner pid=411293)[0m                                  'ppo_max_token_len_per_gpu': 16384,
+[36m(TaskRunner pid=411293)[0m                                  'ppo_micro_batch_size': None,
+[36m(TaskRunner pid=411293)[0m                                  'ppo_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=411293)[0m                                  'ppo_mini_batch_size': 128,
+[36m(TaskRunner pid=411293)[0m                                  'shuffle': False,
+[36m(TaskRunner pid=411293)[0m                                  'strategy': 'fsdp',
+[36m(TaskRunner pid=411293)[0m                                  'ulysses_sequence_parallel_size': 1,
+[36m(TaskRunner pid=411293)[0m                                  'use_dynamic_bsz': True,
+[36m(TaskRunner pid=411293)[0m                                  'use_kl_loss': False,
+[36m(TaskRunner pid=411293)[0m                                  'use_torch_compile': True},
+[36m(TaskRunner pid=411293)[0m                        'adapt_think': {'adjust_old_logprobs': 0,
+[36m(TaskRunner pid=411293)[0m                                        'eot_token_id': 151649,
+[36m(TaskRunner pid=411293)[0m                                        'non_eot_token_id': 71486,
+[36m(TaskRunner pid=411293)[0m                                        'nothinking_max_response_length': 4096,
+[36m(TaskRunner pid=411293)[0m                                        'nothinking_ratio': 0.5},
+[36m(TaskRunner pid=411293)[0m                        'hybrid_engine': True,
+[36m(TaskRunner pid=411293)[0m                        'model': {'enable_gradient_checkpointing': True,
+[36m(TaskRunner pid=411293)[0m                                  'external_lib': None,
+[36m(TaskRunner pid=411293)[0m                                  'override_config': {},
+[36m(TaskRunner pid=411293)[0m                                  'path': '/home/aipmu/models/AdaptThink-1.5B-delta0.05',
+[36m(TaskRunner pid=411293)[0m                                  'use_remove_padding': True},
+[36m(TaskRunner pid=411293)[0m                        'ref': {'fsdp_config': {'param_offload': True,
+[36m(TaskRunner pid=411293)[0m                                                'wrap_policy': {'min_num_params': 0}},
+[36m(TaskRunner pid=411293)[0m                                'log_prob_max_token_len_per_gpu': 16384,
+[36m(TaskRunner pid=411293)[0m                                'log_prob_micro_batch_size': None,
+[36m(TaskRunner pid=411293)[0m                                'log_prob_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=411293)[0m                                'log_prob_use_dynamic_bsz': True,
+[36m(TaskRunner pid=411293)[0m                                'ulysses_sequence_parallel_size': 1},
+[36m(TaskRunner pid=411293)[0m                        'rollout': {'disable_log_stats': True,
+[36m(TaskRunner pid=411293)[0m                                    'do_sample': True,
+[36m(TaskRunner pid=411293)[0m                                    'dtype': 'bfloat16',
+[36m(TaskRunner pid=411293)[0m                                    'enable_chunked_prefill': True,
+[36m(TaskRunner pid=411293)[0m                                    'enforce_eager': True,
+[36m(TaskRunner pid=411293)[0m                                    'free_cache_engine': True,
+[36m(TaskRunner pid=411293)[0m                                    'gpu_memory_utilization': 0.9,
+[36m(TaskRunner pid=411293)[0m                                    'ignore_eos': False,
+[36m(TaskRunner pid=411293)[0m                                    'load_format': 'dummy_dtensor',
+[36m(TaskRunner pid=411293)[0m                                    'log_prob_max_token_len_per_gpu': 16384,
+[36m(TaskRunner pid=411293)[0m                                    'log_prob_micro_batch_size': None,
+[36m(TaskRunner pid=411293)[0m                                    'log_prob_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=411293)[0m                                    'log_prob_use_dynamic_bsz': True,
+[36m(TaskRunner pid=411293)[0m                                    'max_model_len': None,
+[36m(TaskRunner pid=411293)[0m                                    'max_num_batched_tokens': 24576,
+[36m(TaskRunner pid=411293)[0m                                    'max_num_seqs': 64,
+[36m(TaskRunner pid=411293)[0m                                    'n': 1,
+[36m(TaskRunner pid=411293)[0m                                    'name': 'vllm',
+[36m(TaskRunner pid=411293)[0m                                    'prompt_length': 4096,
+[36m(TaskRunner pid=411293)[0m                                    'response_length': 16384,
+[36m(TaskRunner pid=411293)[0m                                    'temperature': 1.0,
+[36m(TaskRunner pid=411293)[0m                                    'tensor_model_parallel_size': 1,
+[36m(TaskRunner pid=411293)[0m                                    'top_k': -1,
+[36m(TaskRunner pid=411293)[0m                                    'top_p': 1,
+[36m(TaskRunner pid=411293)[0m                                    'use_fire_sampling': False,
+[36m(TaskRunner pid=411293)[0m                                    'val_kwargs': {'do_sample': True,
+[36m(TaskRunner pid=411293)[0m                                                   'max_tokens': 16384,
+[36m(TaskRunner pid=411293)[0m                                                   'n': 1,
+[36m(TaskRunner pid=411293)[0m                                                   'temperature': 0.6,
+[36m(TaskRunner pid=411293)[0m                                                   'top_k': -1,
+[36m(TaskRunner pid=411293)[0m                                                   'top_p': 0.95}}},
+[36m(TaskRunner pid=411293)[0m  'algorithm': {'adv_estimator': 'naive',
+[36m(TaskRunner pid=411293)[0m                'gamma': 1.0,
+[36m(TaskRunner pid=411293)[0m                'kl_ctrl': {'horizon': 10000,
+[36m(TaskRunner pid=411293)[0m                            'kl_coef': 0.001,
+[36m(TaskRunner pid=411293)[0m                            'target_kl': 0.1,
+[36m(TaskRunner pid=411293)[0m                            'type': 'fixed'},
+[36m(TaskRunner pid=411293)[0m                'kl_penalty': 'kl',
+[36m(TaskRunner pid=411293)[0m                'lam': 1.0,
+[36m(TaskRunner pid=411293)[0m                'use_kl_in_reward': False},
+[36m(TaskRunner pid=411293)[0m  'critic': {'checkpoint': {'contents': ['model', 'optimizer', 'extra']},
+[36m(TaskRunner pid=411293)[0m             'cliprange_value': 0.5,
+[36m(TaskRunner pid=411293)[0m             'forward_max_token_len_per_gpu': 32768,
+[36m(TaskRunner pid=411293)[0m             'forward_micro_batch_size': None,
+[36m(TaskRunner pid=411293)[0m             'forward_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=411293)[0m             'grad_clip': 1.0,
+[36m(TaskRunner pid=411293)[0m             'model': {'enable_gradient_checkpointing': True,
+[36m(TaskRunner pid=411293)[0m                       'external_lib': None,
+[36m(TaskRunner pid=411293)[0m                       'fsdp_config': {'fsdp_size': -1,
+[36m(TaskRunner pid=411293)[0m                                       'optimizer_offload': False,
+[36m(TaskRunner pid=411293)[0m                                       'param_offload': False,
+[36m(TaskRunner pid=411293)[0m                                       'wrap_policy': {'min_num_params': 0}},
+[36m(TaskRunner pid=411293)[0m                       'override_config': {},
+[36m(TaskRunner pid=411293)[0m                       'path': '~/models/deepseek-llm-7b-chat',
+[36m(TaskRunner pid=411293)[0m                       'tokenizer_path': '/home/aipmu/models/AdaptThink-1.5B-delta0.05',
+[36m(TaskRunner pid=411293)[0m                       'use_remove_padding': False},
+[36m(TaskRunner pid=411293)[0m             'optim': {'lr': 1e-05,
+[36m(TaskRunner pid=411293)[0m                       'lr_warmup_steps_ratio': 0.0,
+[36m(TaskRunner pid=411293)[0m                       'min_lr_ratio': None,
+[36m(TaskRunner pid=411293)[0m                       'total_training_steps': -1,
+[36m(TaskRunner pid=411293)[0m                       'warmup_style': 'constant',
+[36m(TaskRunner pid=411293)[0m                       'weight_decay': 0.01},
+[36m(TaskRunner pid=411293)[0m             'ppo_epochs': 1,
+[36m(TaskRunner pid=411293)[0m             'ppo_max_token_len_per_gpu': 32768,
+[36m(TaskRunner pid=411293)[0m             'ppo_micro_batch_size': None,
+[36m(TaskRunner pid=411293)[0m             'ppo_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=411293)[0m             'ppo_mini_batch_size': 128,
+[36m(TaskRunner pid=411293)[0m             'rollout_n': 1,
+[36m(TaskRunner pid=411293)[0m             'shuffle': False,
+[36m(TaskRunner pid=411293)[0m             'strategy': 'fsdp',
+[36m(TaskRunner pid=411293)[0m             'ulysses_sequence_parallel_size': 1,
+[36m(TaskRunner pid=411293)[0m             'use_dynamic_bsz': True},
+[36m(TaskRunner pid=411293)[0m  'custom_reward_function': {'name': 'adapt_think_rm',
+[36m(TaskRunner pid=411293)[0m                             'path': './src/adapt_think_rm.py'},
+[36m(TaskRunner pid=411293)[0m  'data': {'custom_cls': {'name': None, 'path': None},
+[36m(TaskRunner pid=411293)[0m           'filter_overlong_prompts': False,
+[36m(TaskRunner pid=411293)[0m           'filter_overlong_prompts_workers': 1,
+[36m(TaskRunner pid=411293)[0m           'image_key': 'images',
+[36m(TaskRunner pid=411293)[0m           'max_prompt_length': 4096,
+[36m(TaskRunner pid=411293)[0m           'max_response_length': 16384,
+[36m(TaskRunner pid=411293)[0m           'prompt_key': 'prompt',
+[36m(TaskRunner pid=411293)[0m           'return_raw_chat': False,
+[36m(TaskRunner pid=411293)[0m           'return_raw_input_ids': False,
+[36m(TaskRunner pid=411293)[0m           'reward_fn_key': 'data_source',
+[36m(TaskRunner pid=411293)[0m           'shuffle': True,
+[36m(TaskRunner pid=411293)[0m           'tokenizer': None,
+[36m(TaskRunner pid=411293)[0m           'train_batch_size': 128,
+[36m(TaskRunner pid=411293)[0m           'train_files': './data/train/preprocessed_data/deepscaler.parquet',
+[36m(TaskRunner pid=411293)[0m           'truncation': 'error',
+[36m(TaskRunner pid=411293)[0m           'val_batch_size': 128,
+[36m(TaskRunner pid=411293)[0m           'val_files': ['./data/test/preprocessed_data/aime*16.parquet']},
+[36m(TaskRunner pid=411293)[0m  'reward_model': {'enable': False,
+[36m(TaskRunner pid=411293)[0m                   'forward_max_token_len_per_gpu': 32768,
+[36m(TaskRunner pid=411293)[0m                   'max_length': None,
+[36m(TaskRunner pid=411293)[0m                   'micro_batch_size': None,
+[36m(TaskRunner pid=411293)[0m                   'micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=411293)[0m                   'model': {'external_lib': None,
+[36m(TaskRunner pid=411293)[0m                             'fsdp_config': {'fsdp_size': -1,
+[36m(TaskRunner pid=411293)[0m                                             'param_offload': False,
+[36m(TaskRunner pid=411293)[0m                                             'wrap_policy': {'min_num_params': 0}},
+[36m(TaskRunner pid=411293)[0m                             'input_tokenizer': '/home/aipmu/models/AdaptThink-1.5B-delta0.05',
+[36m(TaskRunner pid=411293)[0m                             'path': '~/models/FsfairX-LLaMA3-RM-v0.1',
+[36m(TaskRunner pid=411293)[0m                             'use_remove_padding': False},
+[36m(TaskRunner pid=411293)[0m                   'reward_kwargs': {'nothinking_bonus': 0,
+[36m(TaskRunner pid=411293)[0m                                     'ref_result_file': None},
+[36m(TaskRunner pid=411293)[0m                   'reward_manager': 'adapt_think',
+[36m(TaskRunner pid=411293)[0m                   'strategy': 'fsdp',
+[36m(TaskRunner pid=411293)[0m                   'ulysses_sequence_parallel_size': 1,
+[36m(TaskRunner pid=411293)[0m                   'use_dynamic_bsz': True},
+[36m(TaskRunner pid=411293)[0m  'trainer': {'balance_batch': True,
+[36m(TaskRunner pid=411293)[0m              'critic_warmup': 0,
+[36m(TaskRunner pid=411293)[0m              'default_hdfs_dir': None,
+[36m(TaskRunner pid=411293)[0m              'default_local_dir': '/home/aipmu/AdaptThink/outputs/AdaptThink-1.5B-delta0.05',
+[36m(TaskRunner pid=411293)[0m              'del_local_ckpt_after_load': False,
+[36m(TaskRunner pid=411293)[0m              'experiment_name': 'eval-aime_16-len16384-n1-AdaptThink-1.5B-delta0.05',
+[36m(TaskRunner pid=411293)[0m              'log_val_generations': 0,
+[36m(TaskRunner pid=411293)[0m              'logger': ['console'],
+[36m(TaskRunner pid=411293)[0m              'max_actor_ckpt_to_keep': None,
+[36m(TaskRunner pid=411293)[0m              'max_critic_ckpt_to_keep': None,
+[36m(TaskRunner pid=411293)[0m              'n_gpus_per_node': 1,
+[36m(TaskRunner pid=411293)[0m              'nnodes': 1,
+[36m(TaskRunner pid=411293)[0m              'project_name': 'adapt_think_verl-eval',
+[36m(TaskRunner pid=411293)[0m              'ray_wait_register_center_timeout': 300,
+[36m(TaskRunner pid=411293)[0m              'resume_from_path': None,
+[36m(TaskRunner pid=411293)[0m              'resume_mode': 'auto',
+[36m(TaskRunner pid=411293)[0m              'save_freq': -1,
+[36m(TaskRunner pid=411293)[0m              'test_freq': -1,
+[36m(TaskRunner pid=411293)[0m              'total_epochs': 30,
+[36m(TaskRunner pid=411293)[0m              'total_training_steps': None,
+[36m(TaskRunner pid=411293)[0m              'val_before_train': True,
+[36m(TaskRunner pid=411293)[0m              'val_only': True,
+[36m(TaskRunner pid=411293)[0m              'val_result_save_dir': '/home/aipmu/AdaptThink/outputs/AdaptThink-1.5B-delta0.05/eval_results_aime_16_len16384_n1'}}
+[36m(TaskRunner pid=411293)[0m using customized reward function 'adapt_think_rm' from './src/adapt_think_rm.py'
+[36m(TaskRunner pid=411293)[0m DeprecationWarning: `ray.state.available_resources_per_node` is a private attribute and access will be removed in a future Ray version.
+[36m(TaskRunner pid=411293)[0m WARNING:2026-11-12 21:48:06,873:Waiting for register center actor C4TSPZ_register_center to be ready. Elapsed time: 0 seconds out of 300 seconds.
+[36m(WorkerDict pid=411458)[0m Flash Attention 2.0 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen2ForCausalLM is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `torch_dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", torch_dtype=torch.float16)`
+[36m(WorkerDict pid=411458)[0m You are attempting to use Flash Attention 2.0 with a model not initialized on GPU. Make sure to move the model to GPU after initializing it on CPU with `model.to('cuda')`.
+[36m(WorkerDict pid=411458)[0m [rank0]:[W1112 21:48:32.715847409 ProcessGroupNCCL.cpp:4561] [PG ID 0 PG GUID 0 Rank 0]  using GPU 0 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect. Specify device_ids in barrier() to force use of a particular device, or call init_process_group() with a device_id.
+[36m(WorkerDict pid=411458)[0m /home/aipmu/miniconda3/envs/adapt_think/lib/python3.10/site-packages/torch/distributed/fsdp/_init_utils.py:444: UserWarning: FSDP is switching to use `NO_SHARD` instead of ShardingStrategy.FULL_SHARD since the world size is 1.
+[36m(WorkerDict pid=411458)[0m   warnings.warn(
+[36m(WorkerDict pid=411458)[0m /home/aipmu/miniconda3/envs/adapt_think/lib/python3.10/site-packages/torch/distributed/fsdp/fully_sharded_data_parallel.py:690: FutureWarning: FSDP.state_dict_type() and FSDP.set_state_dict_type() are being deprecated. Please use APIs, get_state_dict() and set_state_dict(), which can support different parallelisms, FSDP1, FSDP2, DDP. API doc: https://pytorch.org/docs/stable/distributed.checkpoint.html#torch.distributed.checkpoint.state_dict.get_state_dict .Tutorial: https://pytorch.org/tutorials/recipes/distributed_checkpoint_recipe.html .
+[36m(WorkerDict pid=411458)[0m   warnings.warn(
+[36m(WorkerDict pid=411458)[0m /home/aipmu/miniconda3/envs/adapt_think/lib/python3.10/site-packages/torch/distributed/fsdp/_state_dict_utils.py:773: UserWarning: When using ``NO_SHARD`` for ``ShardingStrategy``, full_state_dict willbe returned.
+[36m(WorkerDict pid=411458)[0m   warnings.warn(
+[36m(WorkerDict pid=411458)[0m /home/aipmu/miniconda3/envs/adapt_think/lib/python3.10/site-packages/torch/distributed/fsdp/_state_dict_utils.py:711: UserWarning: When using ``NO_SHARD`` for ``ShardingStrategy``, full_state_dict willbe returned.
+[36m(WorkerDict pid=411458)[0m   warnings.warn(
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m NOTHINKING BONUS: 0
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m WARNING: val_batch_size is deprecated. Validation datasets are sent to inference engines as a whole batch, which will schedule the memory themselves.
+[36m(TaskRunner pid=411293)[0m [validate_config] All configuration checks passed successfully!
+[36m(TaskRunner pid=411293)[0m dataset len: 40315
+[36m(TaskRunner pid=411293)[0m dataset len: 480
+[36m(TaskRunner pid=411293)[0m Size of train dataloader: 314
+[36m(TaskRunner pid=411293)[0m Total training steps: 9420
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m ADV_ESTIMATOR: naive
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m 
+[36m(WorkerDict pid=411458)[0m Model config after override: Qwen2Config {
+[36m(WorkerDict pid=411458)[0m   "architectures": [
+[36m(WorkerDict pid=411458)[0m     "Qwen2ForCausalLM"
+[36m(WorkerDict pid=411458)[0m   ],
+[36m(WorkerDict pid=411458)[0m   "attention_dropout": 0.0,
+[36m(WorkerDict pid=411458)[0m   "bos_token_id": 151646,
+[36m(WorkerDict pid=411458)[0m   "eos_token_id": 151643,
+[36m(WorkerDict pid=411458)[0m   "hidden_act": "silu",
+[36m(WorkerDict pid=411458)[0m   "hidden_size": 1536,
+[36m(WorkerDict pid=411458)[0m   "initializer_range": 0.02,
+[36m(WorkerDict pid=411458)[0m   "intermediate_size": 8960,
+[36m(WorkerDict pid=411458)[0m   "max_position_embeddings": 131072,
+[36m(WorkerDict pid=411458)[0m   "max_window_layers": 21,
+[36m(WorkerDict pid=411458)[0m   "model_type": "qwen2",
+[36m(WorkerDict pid=411458)[0m   "num_attention_heads": 12,
+[36m(WorkerDict pid=411458)[0m   "num_hidden_layers": 28,
+[36m(WorkerDict pid=411458)[0m   "num_key_value_heads": 2,
+[36m(WorkerDict pid=411458)[0m   "pad_token_id": 151643,
+[36m(WorkerDict pid=411458)[0m   "rms_norm_eps": 1e-06,
+[36m(WorkerDict pid=411458)[0m   "rope_scaling": null,
+[36m(WorkerDict pid=411458)[0m   "rope_theta": 10000,
+[36m(WorkerDict pid=411458)[0m   "sliding_window": 4096,
+[36m(WorkerDict pid=411458)[0m   "tie_word_embeddings": false,
+[36m(WorkerDict pid=411458)[0m   "torch_dtype": "bfloat16",
+[36m(WorkerDict pid=411458)[0m   "transformers_version": "4.51.2",
+[36m(WorkerDict pid=411458)[0m   "use_cache": true,
+[36m(WorkerDict pid=411458)[0m   "use_mrope": false,
+[36m(WorkerDict pid=411458)[0m   "use_sliding_window": false,
+[36m(WorkerDict pid=411458)[0m   "vocab_size": 151936
+[36m(WorkerDict pid=411458)[0m }
+[36m(WorkerDict pid=411458)[0m 
+[36m(WorkerDict pid=411458)[0m Monkey patch _flash_attention_forward in transformers.integrations.flash_attention
+[36m(WorkerDict pid=411458)[0m NCCL version 2.21.5+cuda12.4
+[36m(WorkerDict pid=411458)[0m Qwen2ForCausalLM contains 1.78B parameters
+[36m(WorkerDict pid=411458)[0m wrap_policy: functools.partial(<function _or_policy at 0x75cab2a2d2d0>, policies=[functools.partial(<function transformer_auto_wrap_policy at 0x75cab2a2d1b0>, transformer_layer_cls={<class 'transformers.models.qwen2.modeling_qwen2.Qwen2DecoderLayer'>})])
+[36m(WorkerDict pid=411458)[0m Total steps: 9420, num_warmup_steps: 0
+[36m(WorkerDict pid=411458)[0m Actor use_remove_padding=True
+[36m(WorkerDict pid=411458)[0m Before building vllm rollout, memory allocated (GB): 6.620169639587402, memory reserved (GB): 10.521484375
+[36m(WorkerDict pid=411458)[0m WARNING 11-12 21:48:40 [cuda.py:95] To see benefits of async output processing, enable CUDA graph. Since, enforce-eager is enabled, async output processor cannot be used
+[36m(WorkerDict pid=411458)[0m WARNING 11-12 21:48:41 [utils.py:2321] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x75ca33594070>
+[36m(WorkerDict pid=411458)[0m WARNING 11-12 21:48:41 [interface.py:303] Using 'pin_memory=False' as WSL is detected. This may slow down the performance.
+[36m(WorkerDict pid=411458)[0m WARNING 11-12 21:48:41 [topk_topp_sampler.py:63] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+[36m(TaskRunner pid=411293)[0m Using LocalLogger is deprecated. The constructor API will change 
+[36m(TaskRunner pid=411293)[0m Checkpoint tracker file does not exist: %s /home/aipmu/AdaptThink/outputs/AdaptThink-1.5B-delta0.05/latest_checkpointed_iteration.txt
+[36m(TaskRunner pid=411293)[0m Training from scratch
+[36m(WorkerDict pid=411458)[0m kwargs: {'n': 1, 'logprobs': 0, 'max_tokens': 16384, 'detokenize': False, 'temperature': 1.0, 'top_k': -1, 'top_p': 1, 'ignore_eos': False}
+[36m(WorkerDict pid=411458)[0m After building vllm rollout, memory allocated (GB): 10.987031936645508, memory reserved (GB): 16.798828125
+[36m(WorkerDict pid=411458)[0m After building sharding manager, memory allocated (GB): 10.987031936645508, memory reserved (GB): 16.798828125
+[36m(TaskRunner pid=411293)[0m test_gen_batch meta info: {'eos_token_id': 151643, 'pad_token_id': 151643, 'recompute_log_prob': False, 'do_sample': True, 'validate': True}
+[36m(TaskRunner pid=411293)[0m validation generation end
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m [data_source]source_aime_nothinking
+[36m(TaskRunner pid=411293)[0m [prompt] <｜User｜>Every morning Aya goes for a $9$-kilometer-long walk and stops at a coffee shop afterwards. When she walks at a constant speed of $s$ kilometers per hour, the walk takes her 4 hours, including $t$ minutes spent in the coffee shop. When she walks $s+2$ kilometers per hour, the walk takes her 2 hours and 24 minutes, including $t$ minutes spent in the coffee shop. Suppose Aya walks at $s+\frac{1}{2}$ kilometers per hour. Find the number of minutes the walk takes her, including the $t$ minutes spent in the coffee shop.<｜Assistant｜><think>
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m [response] </think>
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m We need to determine the number of minutes Aya's walk takes her, including the \( t \) minutes spent in the coffee shop, if she walks at \( s + \frac{1}{2} \) kilometers per hour. 
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m First, let's analyze the given information:
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m 1. **When Aya walks at \( s \) km/h:**
+[36m(TaskRunner pid=411293)[0m    - She walks 9 km and takes 4 hours, including \( t \) minutes in the coffee shop.
+[36m(TaskRunner pid=411293)[0m    - Therefore, the time spent walking is \( 4 - \frac{t}{60} \) hours.
+[36m(TaskRunner pid=411293)[0m    - The speed is \( s \) km/h, so the time spent walking is \( \frac{9}{s} \) hours.
+[36m(TaskRunner pid=411293)[0m    - Thus, we have the equation:
+[36m(TaskRunner pid=411293)[0m      \[
+[36m(TaskRunner pid=411293)[0m      \frac{9}{s} = 4 - \frac{t}{60}
+[36m(TaskRunner pid=411293)[0m      \]
+[36m(TaskRunner pid=411293)[0m      \[
+[36m(TaskRunner pid=411293)[0m      \frac{9}{s} = \frac{240 - t}{60}
+[36m(TaskRunner pid=411293)[0m      \]
+[36m(TaskRunner pid=411293)[0m      \[
+[36m(TaskRunner pid=411293)[0m      \frac{9}{s} = \frac{240 - t}{60}
+[36m(TaskRunner pid=411293)[0m      \]
+[36m(TaskRunner pid=411293)[0m      Cross-multiplying, we get:
+[36m(TaskRunner pid=411293)[0m      \[
+[36m(TaskRunner pid=411293)[0m      9 \times 60 = s \times (240 - t)
+[36m(TaskRunner pid=411293)[0m      \]
+[36m(TaskRunner pid=411293)[0m      \[
+[36m(TaskRunner pid=411293)[0m      540 = 240s - st \quad \text{(1)}
+[36m(TaskRunner pid=411293)[0m      \]
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m 2. **When Aya walks at \( s + 2 \) km/h:**
+[36m(TaskRunner pid=411293)[0m    - She takes 2 hours and 24 minutes, which is \( 2 + \frac{24}{60} = 2.4 \) hours.
+[36m(TaskRunner pid=411293)[0m    - The time spent walking is \( 2.4 - \frac{t}{60} \) hours.
+[36m(TaskRunner pid=411293)[0m    - The speed is \( s + 2 \) km/h, so the time spent walking is \( \frac{9}{s + 2} \) hours.
+[36m(TaskRunner pid=411293)[0m    - Thus, we have the equation:
+[36m(TaskRunner pid=411293)[0m      \[
+[36m(TaskRunner pid=411293)[0m      \frac{9}{s + 2} = 2.4 - \frac{t}{60}
+[36m(TaskRunner pid=411293)[0m      \]
+[36m(TaskRunner pid=411293)[0m      \[
+[36m(TaskRunner pid=411293)[0m      \frac{9}{s + 2} = \frac{1440 - 10t}{600}
+[36m(TaskRunner pid=411293)[0m      \]
+[36m(TaskRunner pid=411293)[0m      Cross-multiplying, we get:
+[36m(TaskRunner pid=411293)[0m      \[
+[36m(TaskRunner pid=411293)[0m      9 \times 600 = (s + 2)(1440 - 10t)
+[36m(TaskRunner pid=411293)[0m      \]
+[36m(TaskRunner pid=411293)[0m      \[
+[36m(TaskRunner pid=411293)[0m      5400 = (s + 2)(1440 - 10t) \quad \text{(2)}
+[36m(TaskRunner pid=411293)[0m      \]
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Now, we have two equations:
+[36m(TaskRunner pid=411293)[0m 1. \( 540 = 240s - st \)
+[36m(TaskRunner pid=411293)[0m 2. \( 5400 = (s + 2)(1440 - 10t) \)
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Let's simplify equation (2):
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 5400 = (s + 2)(1440 - 10t)
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m Divide both sides by 10:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 540 = (s + 2)(144 - t)
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m So,
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 540 = 144(s + 2) - t(s + 2)
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 540 = 144s + 288 - ts - 2t
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m Rearrange:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 540 - 144s - 288 + ts + 2t = 0
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 252 - 144s + ts + 2t = 0
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m Factor out \( t \):
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 252 - 144s + t(s + 2) = 0 \quad \text{(3)}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m From equation (1):
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 540 = 240s - st
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m Rearrange:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m st = 240s - 540
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m t = \frac{240s - 540}{s}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m t = 240 - \frac{540}{s} \quad \text{(4)}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Substitute \( t \) from equation (4) into equation (3):
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 252 - 144s + \left(240 - \frac{540}{s}\right)(s + 2) = 0
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m Simplify the term:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 252 - 144s + 240(s + 2) - \frac{540}{s}(s + 2) = 0
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 252 - 144s + 240s + 480 - \frac{540(s + 2)}{s} = 0
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m Combine like terms:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 252 + 480 + (-144s + 240s) - \frac{540(s + 2)}{s} = 0
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 732 + 96s - \frac{540(s + 2)}{s} = 0
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m Multiply through by \( s \) to eliminate the denominator:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 732s + 96s^2 - 540(s + 2) = 0
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m Expand and simplify:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 732s + 96s^2 - 540s - 1080 = 0
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 96s^2 + (732s - 540s) - 1080 = 0
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 96s^2 + 192s - 1080 = 0
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m Divide the entire equation by 48:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 2s^2 + 4s - 22.5 = 0
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m Multiply through by 2 to eliminate the decimal:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 4s^2 + 8s - 45 = 0
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m Solve the quadratic equation using the quadratic formula \( s = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} \):
+[36m(TaskRunner pid=411293)[0m Here, \( a = 4 \), \( b = 8 \), \( c = -45 \):
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m s = \frac{-8 \pm \sqrt{64 + 720}}{8}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m s = \frac{-8 \pm \sqrt{784}}{8}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m s = \frac{-8 \pm 28}{8}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m We discard the negative solution since speed cannot be negative:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m s = \frac{20}{8} = 2.5 \text{ km/h}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Now, substitute \( s = 2.5 \) back into equation (4) to find \( t \):
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m t = 240 - \frac{540}{2.5}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m t = 240 - 216
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m t = 24 \text{ minutes}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Next, we need to find the time taken when Aya walks at \( s + \frac{1}{2} = 2.5 + 0.5 = 3 \) km/h. The total walking time is:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m \text{Time} = \frac{9}{3} = 3 \text{ hours}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m Including the 24 minutes spent in the coffee shop, the total time is:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 3 \text{ hours} + \frac{24}{60} \text{ hours} = 3 + 0.4 = 3.4 \text{ hours}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m Convert 3.4 hours to minutes:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m 3.4 \times 60 = 204 \text{ minutes}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Thus, the number of minutes the walk takes her, including the \( t \) minutes spent in the coffee shop, is:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m \boxed{204}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m [ground_truth] 204
+[36m(TaskRunner pid=411293)[0m [score] 1
+[36m(TaskRunner pid=411293)[0m [acc] 1
+[36m(TaskRunner pid=411293)[0m [pred] 204
+[36m(TaskRunner pid=411293)[0m [response_length] 1777
+[36m(TaskRunner pid=411293)[0m [ground_truth] 204
+[36m(TaskRunner pid=411293)[0m [enforce_nothinking] False
+[36m(TaskRunner pid=411293)[0m [is_nothinking] True
+[36m(TaskRunner pid=411293)[0m [nothinking_response_length] 1777
+[36m(TaskRunner pid=411293)[0m [nothinking_acc] 1
+[36m(TaskRunner pid=411293)[0m [thinking_response_length] None
+[36m(TaskRunner pid=411293)[0m [thinking_acc] None
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m [data_source]source_aime_thinking
+[36m(TaskRunner pid=411293)[0m [prompt] <｜User｜>Jen enters a lottery by picking $4$ distinct numbers from $S=\{1,2,3,\cdots,9,10\}.$ $4$ numbers are randomly chosen from $S.$ She wins a prize if at least two of her numbers were $2$ of the randomly chosen numbers, and wins the grand prize if all four of her numbers were the randomly chosen numbers. The probability of her winning the grand prize given that she won a prize is $\tfrac{m}{n}$ where $m$ and $n$ are relatively prime positive integers. Find $m+n$.<｜Assistant｜><think>
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m [response] Alright, so Jen is playing this lottery where she picks 4 distinct numbers from the set S = {1,2,3,...,9,10}. Then, 4 numbers are randomly chosen from S. She wins a prize if at least two of her numbers are among those chosen, and she wins the grand prize if all four of her numbers are the randomly chosen ones. We need to find the probability that she wins the grand prize given that she won a prize. The answer should be in the form m/n where m and n are coprime, and then find m + n.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Okay, so this is a conditional probability problem. The formula for conditional probability is P(A|B) = P(A ∩ B) / P(B). In this case, event A is her winning the grand prize, and event B is her winning a prize (which is at least two numbers matching). So, we need to find P(A ∩ B)/P(B). But since winning the grand prize implies that she has all four numbers correct, which certainly means she has at least two correct, so P(A ∩ B) is just P(A). Therefore, the probability we're looking for is P(A)/P(B).
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m So, let's compute P(A) and P(B).
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m First, let's figure out the total number of possible 4-number combinations from S. Since S has 10 numbers, the total number of possible combinations is C(10,4), which is 210.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Now, P(A) is the probability that all four numbers she picked are the ones drawn. So, how many ways can she pick all four numbers correctly? Only one way, which is choosing the exact same four numbers as the lottery draw. Therefore, P(A) = 1 / C(10,4) = 1/210.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Next, we need to find P(B), the probability that she wins a prize, which is at least two of her numbers are in the lottery draw. So, this is the probability that in her 4 numbers, at least two match the four drawn.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Calculating P(B) might be a bit more involved. Let's think about it. The probability that she wins a prize is equal to 1 minus the probability that she has fewer than two matching numbers. That is, 1 - [P(0 matches) + P(1 match)]. So, we can compute these probabilities and subtract.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m So, let's compute P(0 matches), P(1 match), and then subtract their sum from 1 to get P(B).
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m First, let's calculate the number of ways to have 0 matches. That is, none of her numbers are in the lottery draw. So, she picks 4 numbers from the 6 numbers not in the lottery draw. So, the number of ways is C(6,4). Similarly, the number of ways to have 1 match is C(4,1)*C(6,3). Because she has 4 numbers, she can choose 1 from her numbers and 3 from the non-lottery numbers.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Wait, hold on. Let me make sure I'm doing this correctly.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Total number of possible lottery draws is C(10,4) = 210.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Number of ways to have 0 matches: She picks 4 numbers from the 6 numbers not in the lottery. So, C(6,4). Let me compute that: 6! / (4!2!) = 15.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Number of ways to have exactly 1 match: She picks 1 number from her 4 numbers and 3 numbers from the remaining 6 numbers. So, C(4,1)*C(6,3). Compute that: 4 * (6! / (3!3!)) = 4 * 20 = 80.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Therefore, the number of ways to have 0 or 1 matches is 15 + 80 = 95.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Therefore, the number of ways to have at least two matches is total combinations minus 0 and 1 matches: 210 - 95 = 115.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Therefore, P(B) = 115 / 210.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Simplify that fraction: 115 and 210 are both divisible by 5. 115 ÷5=23, 210 ÷5=42. So, 23/42.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m So, P(B) = 23/42.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Earlier, we found that P(A) = 1/210.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Therefore, the conditional probability P(A|B) = P(A)/P(B) = (1/210) / (23/42) = (1/210) * (42/23) = (42)/(210*23).
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Simplify 42/210: 42 divides into 210 5 times (since 42*5=210). So, 42/210 = 1/5.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Therefore, P(A|B) = (1/5)/23 = 1/(5*23) = 1/115.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Wait, hold on, that seems off because 42 divided by 210 is 1/5, so 1/5 divided by 23 is 1/(5*23) = 1/115. So, the probability is 1/115.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m But that seems low. Let me double-check my calculations.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Total combinations: C(10,4)=210.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Number of ways to have 0 matches: C(6,4)=15.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Number of ways to have 1 match: C(4,1)*C(6,3)=4*20=80.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Total ways for 0 or 1 matches: 15+80=95.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Therefore, ways for at least two matches: 210-95=115.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m So, P(B)=115/210=23/42. That seems correct.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m P(A)=1/210.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m So, conditional probability is (1/210)/(23/42)= (1/210)*(42/23)= (42)/(210*23)= (42)/(4830)= simplifying, 42 divides into 4830: 4830 ÷42=115. So, 42/4830=1/115. So, yes, 1/115.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Therefore, the probability is 1/115, so m=1, n=115, which are coprime. Therefore, m + n=1 +115=116.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Wait, but let me think again. Is this correct?
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m So, 1/115 seems low, but let's think: if she has a 1/210 chance of winning the grand prize, and a 23/42 chance of winning any prize, so the probability of winning the grand prize given that she won a prize is (1/210)/(23/42)= (1/210)*(42/23)= (42)/(210*23)= (1)/(5*23)=1/115.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Yes, that seems correct.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Therefore, the answer is 116.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m **Final Answer**
+[36m(TaskRunner pid=411293)[0m \boxed{116}
+[36m(TaskRunner pid=411293)[0m </think>
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Jen enters a lottery by picking 4 distinct numbers from the set \( S = \{1, 2, 3, \ldots, 9, 10\} \). The lottery draws 4 numbers randomly from \( S \). She wins a prize if at least two of her numbers are among the drawn numbers, and the grand prize if all four of her numbers are the drawn numbers. We need to find the probability that she wins the grand prize given that she won a prize.
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m First, we calculate the total number of possible combinations of 4 numbers from \( S \), which is \( \binom{10}{4} = 210 \).
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Next, we determine the probability \( P(A) \) that she wins the grand prize. This is the probability that all four numbers she picked are the ones drawn, which is \( \frac{1}{210} \).
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m To find \( P(B) \), the probability that she wins a prize (i.e., at least two of her numbers are drawn), we calculate the probability of having 0 or 1 match. The number of ways to have 0 matches is \( \binom{6}{4} = 15 \). The number of ways to have exactly 1 match is \( \binom{4}{1} \times \binom{6}{3} = 4 \times 20 = 80 \). Thus, the total number of ways to have 0 or 1 matches is \( 15 + 80 = 95 \). Therefore, the number of ways to have at least two matches is \( 210 - 95 = 115 \). Hence, \( P(B) = \frac{115}{210} = \frac{23}{42} \).
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m The conditional probability \( P(A|B) \) is given by:
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m P(A|B) = \frac{P(A)}{P(B)} = \frac{\frac{1}{210}}{\frac{23}{42}} = \frac{1}{210} \times \frac{42}{23} = \frac{42}{4830} = \frac{1}{115}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m Thus, the probability of winning the grand prize given that she won a prize is \( \frac{1}{115} \). Therefore, \( m = 1 \) and \( n = 115 \), and \( m + n = 1 + 115 = 116 \).
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m \[
+[36m(TaskRunner pid=411293)[0m \boxed{116}
+[36m(TaskRunner pid=411293)[0m \]
+[36m(TaskRunner pid=411293)[0m [ground_truth] 116
+[36m(TaskRunner pid=411293)[0m [score] 1
+[36m(TaskRunner pid=411293)[0m [acc] 1
+[36m(TaskRunner pid=411293)[0m [pred] 116
+[36m(TaskRunner pid=411293)[0m [response_length] 2186
+[36m(TaskRunner pid=411293)[0m [ground_truth] 116
+[36m(TaskRunner pid=411293)[0m [enforce_nothinking] False
+[36m(TaskRunner pid=411293)[0m [is_nothinking] False
+[36m(TaskRunner pid=411293)[0m [nothinking_response_length] None
+[36m(TaskRunner pid=411293)[0m [nothinking_acc] None
+[36m(TaskRunner pid=411293)[0m [thinking_response_length] 2186
+[36m(TaskRunner pid=411293)[0m [thinking_acc] 1
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m SAVE PREDICTION in: /home/aipmu/AdaptThink/outputs/AdaptThink-1.5B-delta0.05/eval_results_aime_16_len16384_n1
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m 
+[36m(TaskRunner pid=411293)[0m ("Initial validation metrics: {'val-aux/aime/reward/mean@16': "
+[36m(TaskRunner pid=411293)[0m  "0.3020833333333333, 'val-aux/aime/score/mean@16': 0.3020833333333333, "
+[36m(TaskRunner pid=411293)[0m  "'val-aux/aime/acc/mean@16': 0.3020833333333333, "
+[36m(TaskRunner pid=411293)[0m  "'val-aux/aime/response_length/mean@16': 6861.554166666667, "
+[36m(TaskRunner pid=411293)[0m  "'val-aux/aime/enforce_nothinking/mean@16': 0.0, "
+[36m(TaskRunner pid=411293)[0m  "'val-aux/aime/is_nothinking/mean@16': 0.45208333333333334, "
+[36m(TaskRunner pid=411293)[0m  "'val-aux/aime/nothinking_response_length/mean@16': 3834.609863516113, "
+[36m(TaskRunner pid=411293)[0m  "'val-aux/aime/nothinking_acc/mean@16': 0.34224837662337665, "
+[36m(TaskRunner pid=411293)[0m  "'val-aux/aime/thinking_response_length/mean@16': 9192.468128349825, "
+[36m(TaskRunner pid=411293)[0m  "'val-aux/aime/thinking_acc/mean@16': 0.3215158353551211}")
+[36m(TaskRunner pid=411293)[0m step:0 - val-aux/aime/reward/mean@16:0.302 - val-aux/aime/score/mean@16:0.302 - val-aux/aime/acc/mean@16:0.302 - val-aux/aime/response_length/mean@16:6861.554 - val-aux/aime/enforce_nothinking/mean@16:0.000 - val-aux/aime/is_nothinking/mean@16:0.452 - val-aux/aime/nothinking_response_length/mean@16:3834.610 - val-aux/aime/nothinking_acc/mean@16:0.342 - val-aux/aime/thinking_response_length/mean@16:9192.468 - val-aux/aime/thinking_acc/mean@16:0.322

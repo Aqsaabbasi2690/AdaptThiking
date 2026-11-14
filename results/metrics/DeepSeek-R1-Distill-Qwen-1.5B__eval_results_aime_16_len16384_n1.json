@@ -1,0 +1,10 @@
+{
+  "val-aux/aime/reward/mean@16": 0.29375,
+  "val-aux/aime/score/mean@16": 0.29375,
+  "val-aux/aime/acc/mean@16": 0.29375,
+  "val-aux/aime/response_length/mean@16": 12241.835416666667,
+  "val-aux/aime/enforce_nothinking/mean@16": 0.0,
+  "val-aux/aime/is_nothinking/mean@16": 0.0,
+  "val-aux/aime/thinking_response_length/mean@16": 12241.835416666667,
+  "val-aux/aime/thinking_acc/mean@16": 0.29375
+}

@@ -1,0 +1,12 @@
+{
+  "val-aux/aime/reward/mean@16": 0.3020833333333333,
+  "val-aux/aime/score/mean@16": 0.3020833333333333,
+  "val-aux/aime/acc/mean@16": 0.3020833333333333,
+  "val-aux/aime/response_length/mean@16": 6861.554166666667,
+  "val-aux/aime/enforce_nothinking/mean@16": 0.0,
+  "val-aux/aime/is_nothinking/mean@16": 0.45208333333333334,
+  "val-aux/aime/nothinking_response_length/mean@16": 3834.609863516113,
+  "val-aux/aime/nothinking_acc/mean@16": 0.34224837662337665,
+  "val-aux/aime/thinking_response_length/mean@16": 9192.468128349825,
+  "val-aux/aime/thinking_acc/mean@16": 0.3215158353551211
+}
