@@ -61,3 +61,15 @@ The GPU memory settings are what worked on this machine; I did not isolate which
 
 Then `python analysis/delta_sweep.py` builds the table in `results/delta_sweep.md`.
 Wall-clock on the RTX A4500: GSM8K plus MATH500 for the five extra checkpoints took roughly 3.5 hours in total.
+
+## 6. Demo app (Gradio)
+
+The app compares the original AdaptThink-1.5B (delta 0.05) with the LoRA-tuned checkpoints on the same question.
+It needs its own environment, because installing Gradio in `adapt_think` can change vLLM's pinned packages:
+
+ conda create -n adapt_gui python=3.10 -y && conda activate adapt_gui
+ pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+ pip install transformers==4.51.2 accelerate gradio
+ python app/app.py        # then open http://localhost:7860
+
+It loads each model (about 3.5 GB) on the GPU, so do not run it while a training or vLLM evaluation job is using the same card.
