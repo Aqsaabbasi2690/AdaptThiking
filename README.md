@@ -1,4 +1,5 @@
 > **Reproduction on a 20 GB GPU:** see [REPRODUCTION.md](REPRODUCTION.md) and [docs/SETUP_20GB_WSL2.md](docs/SETUP_20GB_WSL2.md).
+> **Technical report:** [REPORT.md](REPORT.md). **Demo app:** `app/app.py` (see docs/SETUP_20GB_WSL2.md, section 6).
 
 # [EMNLP2025] AdaptThink: LLM Can Learn When to Think
 
