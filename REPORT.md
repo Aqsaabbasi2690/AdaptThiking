@@ -82,7 +82,7 @@ Accuracy is within 1.2 points of the paper on all three datasets. The largest le
 
 All 12 accuracy comparisons are within 2.4 points of the paper. A larger delta gives a higher NoThinking share and shorter answers; on MATH500 the accuracy gain over the original disappears at delta=0.1.
 
-### 5.3 NoThinking share by MATH level
+### 5.3 NoThinking share by MATH level, and keyword rate per dataset
 
 #### MATH500 by difficulty level (AdaptThink-1.5B d0.05 vs original, ours vs paper)
 

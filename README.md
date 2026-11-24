@@ -1,5 +1,45 @@
-> **Reproduction on a 20 GB GPU:** see [REPRODUCTION.md](REPRODUCTION.md) and [docs/SETUP_20GB_WSL2.md](docs/SETUP_20GB_WSL2.md).
-> **Technical report:** [REPORT.md](REPORT.md). **Demo app:** `app/app.py` (see docs/SETUP_20GB_WSL2.md, section 6).
+# AdaptThink on a single 20 GB GPU: reproduction, analysis and a self-distillation study
+
+This repository is a copy of [THU-KEG/AdaptThink](https://github.com/THU-KEG/AdaptThink) (MIT License) plus my reproduction work. The authors' README follows below.
+
+**What I did**
+
+- Re-evaluated the authors' released checkpoints (no retraining; the paper's RL training needs 8 H800 GPUs) on GSM8K, MATH500 and AIME24 with one RTX A4500 (20 GB, WSL2).
+- Analysed where the behaviour deviates (difficulty levels, implicit thinking, the effect of delta).
+- Tried to improve the accuracy/length trade-off: two inference-time ideas (fallback to Thinking, threshold router) and a LoRA self-distillation study with design and hyperparameter ablations.
+- Result: the paper's claims reproduce; no configuration improved accuracy and length together on all three benchmarks (a negative result, reported with intervals).
+
+**Reproduction (AdaptThink-1.5B, delta 0.05; accuracy % / average length in tokens)**
+
+| | GSM8K | MATH500 | AIME24 |
+|---|---|---|---|
+| Paper | 83.1 / 480 | 82.0 / 1782 | 31.0 / 6679 |
+| This repo | 83.2 / 552 | 83.2 / 1796 | 30.2 / 6862 |
+| Original R1-Distill-Qwen-1.5B (this repo) | 78.5 / 1022 | 81.0 / 4593 | 29.4 / 12242 |
+
+**LoRA self-distillation, change vs the delta=0.05 checkpoint (accuracy points, length %)**
+
+| | GSM8K | MATH500 | AIME24 |
+|---|---|---|---|
+| lr 1e-4 | -0.61, -22.6% | -0.45, -10.3% | -4.38, +0.7% |
+| lr 3e-5 | -0.57, -18.1% | -0.45, -16.3% | -4.79, -4.9% |
+| mode-preserving selection | +0.04, -11.6% | -0.40, -1.3% | -2.29, +7.2% |
+
+The length saving comes from choosing NoThinking more often (not from shorter answers inside a mode), and on the hardest set it costs accuracy. Details, intervals and ablations: [REPORT.md](REPORT.md).
+
+**Where things are**
+
+- [REPORT.md](REPORT.md): technical report. [REPRODUCTION.md](REPRODUCTION.md): earlier reproduction notes.
+- [docs/SETUP_20GB_WSL2.md](docs/SETUP_20GB_WSL2.md): environment and the fixes needed on a 20 GB card; [docs/demo_examples.md](docs/demo_examples.md): demo transcripts.
+- `scripts/run_eval_local.sh`: single-GPU evaluation of released checkpoints; `scripts/run_*_chain.sh`: ablation and test runs.
+- `analysis/`: standalone vLLM sampling and grading (`gen_natural.py`), data selection (`select_sft_data.py`), LoRA training (`sft_lora.py`), tables and analyses.
+- `results/`: tables and plots. `app/app.py`: Gradio demo (own conda env, see the setup notes).
+
+**Limitations.** Released checkpoints were re-evaluated, not retrained; mostly one training seed; AIME24 has only 30 problems. All credit for the method goes to the paper's authors; please cite their paper (citation at the end of the original README).
+
+---
+
+## Original upstream README
 
 # [EMNLP2025] AdaptThink: LLM Can Learn When to Think
 
