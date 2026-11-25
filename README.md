@@ -48,6 +48,12 @@ The fallback buys accuracy with tokens: it removes LoRA's AIME24 loss (-4.79 wit
 
 Details, intervals and ablations: [REPORT.md](REPORT.md).
 
+**Demo app (Gradio)**
+
+![Gradio demo](docs/gui_screenshot.png)
+
+Run: `conda activate adapt_gui && python app/app.py`, then open http://localhost:7860 (setup: docs/SETUP_20GB_WSL2.md, section 6).
+
 **Where things are**
 
 - [REPORT.md](REPORT.md): technical report. [REPRODUCTION.md](REPRODUCTION.md): earlier reproduction notes.
