@@ -1,10 +1,10 @@
-# Re-evaluating AdaptThink on a Single 20 GB GPU: Reproduction, Failure Analysis and Self-Distillation Ablations
+# Re-evaluating AdaptThink on a Single 20 GB GPU: Reproduction, Failure Analysis, Self-Distillation and an Online Implicit-Thinking Fallback
 
 Author: Aqsa. Code, logs and tables: this repository. Setup notes: [docs/SETUP_20GB_WSL2.md](docs/SETUP_20GB_WSL2.md). Earlier reproduction notes: [REPRODUCTION.md](REPRODUCTION.md).
 
 ## 1. Introduction
 
-Large reasoning models such as DeepSeek-R1 think at length even on easy problems, which raises latency and cost. I picked *AdaptThink: Reasoning Models Can Learn When to Think* (Zhang et al., EMNLP 2025, arXiv 2505.13417), which trains a reasoning model with reinforcement learning to choose per problem between a long Thinking mode and a short NoThinking mode. For DeepSeek-R1-Distill-Qwen-1.5B the paper reports a 53% shorter average response and a 2.4-point higher accuracy over three math benchmarks. Because the RL training needs 8 H800 GPUs for about 32 hours (1.5B model, per the paper), I did not retrain. I re-evaluated the authors' released checkpoints with the authors' code on one RTX A4500 (20 GB), compared every number with the paper, analysed where the behaviour deviates, and then tried to improve the accuracy/length trade-off with two inference-time modifications and with a LoRA self-distillation study that includes a design and hyperparameter ablation. My objective was to check the headline claims independently, to locate limitations, and to test which cheap modifications help and why.
+Large reasoning models such as DeepSeek-R1 think at length even on easy problems, which raises latency and cost. I picked *AdaptThink: Reasoning Models Can Learn When to Think* (Zhang et al., EMNLP 2025, arXiv 2505.13417), which trains a reasoning model with reinforcement learning to choose per problem between a long Thinking mode and a short NoThinking mode. For DeepSeek-R1-Distill-Qwen-1.5B the paper reports a 53% shorter average response and a 2.4-point higher accuracy over three math benchmarks. Because the RL training needs 8 H800 GPUs for about 32 hours (1.5B model, per the paper), I did not retrain. I re-evaluated the authors' released checkpoints with the authors' code on one RTX A4500 (20 GB), compared every number with the paper, analysed where the behaviour deviates, and then tried to improve the accuracy/length trade-off with three inference-time modifications and with a LoRA self-distillation study that includes a design and hyperparameter ablation. The last modification, an online fallback that aborts a NoThinking answer as soon as it starts to "think" and re-solves the problem in Thinking mode, gave the one measurable improvement of this study (+1.0 accuracy point on GSM8K at unchanged length). I also checked the paper's out-of-domain claim on MMLU. My objective was to check the headline claims independently, to locate limitations, and to test which cheap modifications help and why.
 
 ## 2. Problem statement and contribution
 
@@ -19,9 +19,12 @@ Large reasoning models such as DeepSeek-R1 think at length even on easy problems
 - Re-evaluated the released delta=0.05 checkpoint on GSM8K, MATH500 and AIME24 and all six released checkpoints on GSM8K and MATH500; all accuracies are within 2.4 points of the paper and the average length reduction is 50.3% (paper: 53.0%).
 - Documented a single-GPU evaluation setup (the upstream scripts target 8 A100-80GB GPUs) and wrote standalone vLLM sampling and grading scripts with roughly three times the generation throughput of the upstream evaluation path on this machine (about 2,400 vs 700 generated tokens per second, estimated from run times).
 - Added a level-wise MATH500 analysis and an implicit-thinking analysis.
-- Tested two modifications that need no training (fallback to Thinking, threshold router): no gain beyond noise.
+- Tested two modifications that need no training and are evaluated offline (fallback to Thinking, threshold router): no gain beyond noise.
 - Studied LoRA self-distillation on 693 self-generated examples with eight validation runs and test evaluation on three benchmarks. Length falls by 10-23% on GSM8K and MATH500 at similar accuracy, but accuracy drops by 4-5 points on AIME24.
-- Showed with ablations and a length decomposition that the length saving comes from raising the NoThinking share, driven by the shortest-answer selection rule. A mode-preserving variant removes the NoThinking shift but also most of the length saving. No configuration improved accuracy and length together on all three benchmarks; I report this as a negative result.
+- Showed with ablations and a length decomposition that the length saving comes from raising the NoThinking share, driven by the shortest-answer selection rule. A mode-preserving variant removes the NoThinking shift but also most of the length saving.
+- Implemented and ran an online implicit-thinking fallback (Modification 4, Section 6.8): a NoThinking answer is stopped at its first "Wait"/"Alternatively" and the problem is re-solved in Thinking mode, with the aborted tokens counted in the length. On the released checkpoint it raises GSM8K accuracy by +0.99 points [+0.08, +1.88] at unchanged length (+1.2%) and raises accuracy on all three benchmarks, at a length cost of 15-18% on MATH500 and AIME24. On top of LoRA A3 it removes A3's AIME24 accuracy loss (26.5% to 31.5%; the released checkpoint has 31.2%) while GSM8K stays 13.5% shorter.
+- Evaluated MMLU (out of domain, paper Table 4) on 2,000 questions: the released checkpoint is 4.2 points more accurate and 37.6% shorter than the original model (paper: +6.5 points, -38.8%). LoRA A3, trained on math only, makes MMLU answers 55% longer.
+- No configuration is both shorter and at least as accurate as the released checkpoint on all three math benchmarks; the trade-offs are reported with intervals.
 
 ## 3. Method summary (the paper)
 
@@ -31,7 +34,7 @@ AdaptThink maximises the probability of the NoThinking mode subject to the accur
 
 - Hardware and software: RTX A4500 (20 GB), WSL2 Ubuntu, Python 3.10, torch 2.6.0, vLLM 0.8.2 (pinned packages in `docs/pip_freeze_adapt_think.txt`).
 - Models: DeepSeek-R1-Distill-Qwen-1.5B and the released AdaptThink-1.5B checkpoints (delta = 0, 0.01, 0.02, 0.05, 0.075, 0.1).
-- Data: GSM8K (1319 problems), MATH500, AIME24 (30 problems, 16 samples each). For fine-tuning: 1000 problems from the DeepScaleR training set; a validation set of 200 other training problems that overlap with no test set.
+- Data: GSM8K (1319 problems), MATH500, AIME24 (30 problems, 16 samples each), and for the out-of-domain check 2,000 randomly chosen MMLU questions (seed 0, out of 14,042). For fine-tuning: 1000 problems from the DeepScaleR training set; a validation set of 200 other training problems that overlap with no test set.
 - Decoding: 16K maximum response length, temperature 0.6, top-p 0.95. The authors' grader (`src/adapt_think_rm.py`) scores all answers.
 - Two evaluation paths: the upstream verl evaluation (Sections 5.1 to 5.4, one sample per problem; 16 for AIME24) and my standalone vLLM evaluation (Section 6, four samples per problem; AIME24 one sample per row). The standalone baseline matches the verl one (for example AIME24: 31.2% vs 30.2%).
 - Intervals are paired bootstrap over problems. Differences of a few points are within noise for single runs (about 1.7 points standard error on 500 problems), and AIME24 has only 30 problems.
@@ -270,6 +273,70 @@ Only problems with at least one response in this mode both before and after are 
 
 **Reading.** On the same problems and in the same mode, NoThinking responses do not get shorter: the change is -13 to +48 tokens on GSM8K and MATH500 and every interval includes 0. Thinking-mode changes range from -165 to +544 tokens on GSM8K and MATH500, mostly positive, with intervals that include 0 and only 43 to 183 problems per cell. The AIME24 intervals are wide (23 to 28 problems per cell) and also include 0. This study therefore finds no evidence that fine-tuning teaches the model to write shorter responses within a mode; the length saving comes from the shift towards NoThinking. Problems that switch mode are not covered by this comparison.
 
+### 6.8 Modification 4: online implicit-thinking fallback
+
+**Motivation.** Two earlier findings point in opposite directions. LoRA A3 shortens responses on GSM8K and MATH500 at unchanged accuracy, but loses 4.8 points on AIME24, where it picks NoThinking more often (57.5% vs 43.5%). Section 5.4 shows that NoThinking responses containing "Wait"/"Alternatively" are far less accurate than the rest (AIME24: 17.9% vs 35.0%). The offline estimate in 6.1 replaced such responses only after they had finished, which is expensive because they average 3,000-5,700 tokens.
+
+**Method** (`analysis/fallback_online.py`, run by `scripts/run_fallback_chain.sh`). The first token is sampled as usual, so the model still chooses its mode. In NoThinking mode, generation stops at the first "Wait" or "Alternatively", and the problem is then regenerated in Thinking mode with the paper's thinking prefix ("Alright"). The reported length counts **all** generated tokens, including the aborted attempt. Sampling settings, data, grader and the number of samples are the same as in Section 6.5, and the baseline is the same natural-sampling run of AdaptThink d0.05. The fallback is applied both to LoRA A3 and, as a control, to the released d0.05 checkpoint. The method, the trigger words and the runs were fixed before any test result was seen; the optional variant with an additional length cap was not run.
+
+**Results** (full table with all columns: `results/fallback_online.md`)
+
+| Dataset | Model | Accuracy % (diff [95% CI]) | Avg length incl. aborted tokens (diff, %) | NoThinking % | Fallback % | Cut at 16K % |
+|---|---|---|---|---|---|---|
+| GSM8K | AdaptThink d0.05 (base) | 83.1 | 513 | 86.8 | 0.0 | 0.4 |
+| GSM8K | d0.05 + online fallback | **84.1 (+0.99 [+0.08, +1.88])** | 519 (+6, +1.2%) | 84.5 | 1.9 | 0.19 |
+| GSM8K | LoRA A3 | 82.5 (-0.57 [-1.50, +0.36]) | 420 (-93, -18.1%) | 96.9 | 0.0 | 0.47 |
+| GSM8K | LoRA A3 + online fallback | 82.7 (-0.42 [-1.38, +0.51]) | 443 (-69, -13.5%) | 95.0 | 2.0 | 0.51 |
+| MATH500 | AdaptThink d0.05 (base) | 81.8 | 1786 | 77.2 | 0.0 | 1.4 |
+| MATH500 | d0.05 + online fallback | 82.0 (+0.15 [-1.30, +1.70]) | 2053 (+266, +14.9%) | 70.1 | 6.0 | 1.85 |
+| MATH500 | LoRA A3 | 81.4 (-0.45 [-2.05, +1.20]) | 1496 (-291, -16.3%) | 91.2 | 0.0 | 1.80 |
+| MATH500 | LoRA A3 + online fallback | 81.6 (-0.25 [-2.00, +1.50]) | 1827 (+41, +2.3%) | 82.5 | 7.5 | 2.50 |
+| AIME24 | AdaptThink d0.05 (base) | 31.2 | 6948 | 43.5 | 0.0 | 12.7 |
+| AIME24 | d0.05 + online fallback | 33.1 (+1.88 [-2.92, +6.88]) | 8182 (+1234, +17.8%) | 19.0 | 22.1 | 13.75 |
+| AIME24 | LoRA A3 | 26.5 (-4.79 [-9.58, -0.62]) | 6609 (-339, -4.9%) | 57.5 | 0.0 | 13.96 |
+| AIME24 | LoRA A3 + online fallback | 31.5 (+0.21 [-5.00, +5.83]) | 8375 (+1426, +20.5%) | 25.6 | 29.2 | 17.92 |
+
+Differences and intervals are paired bootstrap against AdaptThink d0.05 (base). NoThinking % counts a sample as NoThinking only if its final answer was produced in NoThinking mode, so it falls when the fallback fires.
+
+Summary of the change relative to the d0.05 checkpoint (accuracy points, length %):
+
+| | GSM8K | MATH500 | AIME24 |
+|---|---|---|---|
+| LoRA A3 (from 6.5) | -0.57, -18.1% | -0.45, -16.3% | -4.79, -4.9% |
+| d0.05 + online fallback | **+0.99, +1.2%** | +0.15, +14.9% | +1.88, +17.8% |
+| LoRA A3 + online fallback | -0.42, -13.5% | -0.25, +2.3% | +0.21, +20.5% |
+
+**Reading.**
+
+- *Released checkpoint + fallback.* Accuracy is higher on all three benchmarks. On GSM8K the gain is +0.99 points with an interval that excludes 0, at unchanged length (+6 tokens); the fallback fires on only 1.9% of samples there. This is the one accuracy gain over the released checkpoint in this study. On MATH500 and AIME24 the accuracy gains are within noise and the answers are 15-18% longer, because the fallback fires more often (6.0% and 22.1%) and the regenerated Thinking answers are long. Even so, the responses stay far shorter than those of the original model (Section 5.1: 4593 and 12242 tokens, measured with the verl evaluation, so the comparison is approximate).
+- *LoRA A3 + fallback.* The fallback removes the AIME24 accuracy loss of A3 (26.5% to 31.5%, against 31.2% for the released checkpoint) and keeps most of the GSM8K saving (-13.5% length at unchanged accuracy). The price is length: the MATH500 saving disappears (+2.3%) and AIME24 answers are 20.5% longer. A3 chooses NoThinking more often, so more of its answers trigger the fallback (7.5% and 29.2% vs 6.0% and 22.1%).
+- *Early abort.* The online fallback costs less than the offline estimate of 6.1, which had to finish each implicit-thinking answer before replacing it. On AIME24 the offline estimate needed +44% length (conservative cost, 9915 vs 6862 tokens) for +2.4 points; the online fallback needs +17.8% for +1.9 points. The two use different evaluation paths (6.1: verl, one sample; 6.8: standalone, four samples), so this is approximate.
+- *Caution.* About a dozen accuracy comparisons are made in this section, so a single interval that just excludes 0 is weak evidence. The GSM8K gain matches the motivation (Section 5.4: GSM8K NoThinking answers with a keyword are 47.1% accurate against 84.1% for the rest), but it should be confirmed with another sampling seed.
+
+The fallback therefore turns accuracy into length rather than improving both: it is useful where accuracy matters more than tokens, and on easy problems (GSM8K), where it rarely fires, it costs almost nothing.
+
+### 6.9 Out-of-domain check: MMLU (paper Table 4)
+
+2,000 randomly chosen MMLU questions (seed 0), one sample each, same grader and decoding as Section 6.5 (`results/mmlu.md`). Differences are paired bootstrap against AdaptThink d0.05.
+
+| Model | Acc % (diff [95% CI]) | Length (diff, %) | NoThinking % | Cut at 16K % |
+|---|---|---|---|---|
+| DeepSeek-R1-Distill-Qwen-1.5B (original) | 35.9 (-4.30 [-6.70, -2.00]) | 1589 (+596, +60.1%) | 0.0 | 3.70 |
+| AdaptThink d0.05 (base) | 40.1 | 992 | 14.7 | 1.9 |
+| LoRA A3 | 40.2 (+0.05 [-2.25, +2.35]) | 1534 (+542, +54.6%) | 15.1 | 5.70 |
+| LoRA A3 + online fallback | 42.0 (+1.90 [-0.35, +4.10]) | 1538 (+546, +55.0%) | 15.1 | 5.75 |
+
+Comparison with the paper (Table 4, 1.5B, full MMLU):
+
+| | Original acc / length | AdaptThink acc / length / NoThinking % | Change |
+|---|---|---|---|
+| Paper | 35.7 / 1724 | 42.2 / 1055 / 16.4% | +6.5 points, -38.8% length |
+| This repo (2,000-question subset) | 35.9 / 1589 | 40.1 / 992 / 14.7% | +4.2 points, -37.6% length |
+
+- The paper's out-of-domain claim reproduces: the released checkpoint is more accurate and about 38% shorter than the original model on MMLU, choosing NoThinking for about 15% of the questions. The accuracy gain is smaller than in the paper (+4.2 vs +6.5 points), on a 2,000-question subset.
+- LoRA A3, fine-tuned on math answers only, does not generalise its length saving: on MMLU its answers are 55% longer than the released checkpoint's at the same NoThinking share, and 5.7% are cut at 16K (base: 1.9%).
+- The fallback fires on only 0.1% of MMLU samples, so the +1.8-point difference between A3 and A3 + fallback is sampling noise between two runs, not an effect of the fallback.
+
 ## 7. Discussion and limitations
 
 - This is a re-evaluation of released checkpoints plus LoRA fine-tuning on 693 self-generated examples; the RL training itself was not repeated, so training-time claims of the paper are untested here.
@@ -277,12 +344,14 @@ Only problems with at least one response in this mode both before and after are 
 - Validation has 200 problems and AIME24 has 30; the AIME24 conclusions rest on wide intervals. Several comparisons were examined, so isolated intervals that exclude 0 are weaker evidence than they look.
 - The learning-rate choice (A3) was made on validation; A5 to A7 are post-hoc and were not used to select the test configurations except that A7 was added after seeing the AIME24 result for main and A3.
 - The implicit-thinking check is a crude keyword match and the result is correlational.
-- The fallback and router results are offline estimates from one sample per mode.
+- The fallback in 6.1 and the router in 6.2 are offline estimates from one sample per mode. The online fallback in 6.8 is a real generation run, but with one sampling seed.
+- The online fallback uses a plain keyword trigger ("Wait", "Alternatively"). It also fires when these words occur in a non-reflective sense, and it misses reflection phrased differently.
+- MMLU was evaluated on a 2,000-question random subset with one sample per question, not on all 14,042 questions as in the paper.
 - Two evaluation paths (verl and standalone vLLM) are used; they agree on the baseline but are not identical.
 
 ## 8. Conclusion
 
-The headline claims of AdaptThink reproduce closely on one 20 GB GPU: fewer tokens at equal or higher accuracy than the original model. Cheap modifications did not improve on it. LoRA self-distillation with a shortest-answer rule saves 10-23% of the tokens on easy benchmarks with no detectable change in accuracy, but the saving comes from choosing NoThinking more often, and on the hardest benchmark it costs 4-5 points of accuracy. Keeping each problem's usual mode avoids the NoThinking shift but also the saving. In this study no configuration improved accuracy and length together on all three benchmarks.
+The headline claims of AdaptThink reproduce closely on one 20 GB GPU: fewer tokens at equal or higher accuracy than the original model, on the three math benchmarks and out of domain on MMLU (+4.2 points, -37.6% length; paper: +6.5, -38.8%). The offline modifications did not improve on it. LoRA self-distillation with a shortest-answer rule saves 10-23% of the tokens on easy benchmarks with no detectable change in accuracy, but the saving comes from choosing NoThinking more often; on the hardest benchmark it costs 4-5 points of accuracy, and on MMLU the answers get 55% longer. The online implicit-thinking fallback, which stops a NoThinking answer at its first "Wait"/"Alternatively" and re-solves the problem in Thinking mode, is the one modification that measurably improved on the released checkpoint: +1.0 accuracy point on GSM8K at unchanged length, and higher (within-noise) accuracy on MATH500 and AIME24 at 15-18% more tokens. Combined with LoRA it removes LoRA's AIME24 accuracy loss. No configuration is both shorter and at least as accurate on all three benchmarks: the fallback buys accuracy with tokens and LoRA buys tokens with accuracy. A natural next step is to make the trade-off explicit in training, for example by giving zero reward to implicit-thinking NoThinking answers during RL, as the paper itself suggests.
 
 ## References
 

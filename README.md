@@ -1,4 +1,4 @@
-# AdaptThink on a single 20 GB GPU: reproduction, analysis and a self-distillation study
+# AdaptThink on a single 20 GB GPU: reproduction, analysis, self-distillation and an online fallback
 
 This repository is a copy of [THU-KEG/AdaptThink](https://github.com/THU-KEG/AdaptThink) (MIT License) plus my reproduction work. The authors' README follows below.
 
@@ -6,8 +6,9 @@ This repository is a copy of [THU-KEG/AdaptThink](https://github.com/THU-KEG/Ada
 
 - Re-evaluated the authors' released checkpoints (no retraining; the paper's RL training needs 8 H800 GPUs) on GSM8K, MATH500 and AIME24 with one RTX A4500 (20 GB, WSL2).
 - Analysed where the behaviour deviates (difficulty levels, implicit thinking, the effect of delta).
-- Tried to improve the accuracy/length trade-off: two inference-time ideas (fallback to Thinking, threshold router) and a LoRA self-distillation study with design and hyperparameter ablations.
-- Result: the paper's claims reproduce; no configuration improved accuracy and length together on all three benchmarks (a negative result, reported with intervals).
+- Tried to improve the accuracy/length trade-off: three inference-time ideas (offline fallback to Thinking, threshold router, and an **online implicit-thinking fallback**) and a LoRA self-distillation study with design and hyperparameter ablations.
+- Checked the paper's out-of-domain claim on MMLU.
+- Result: the paper's claims reproduce, including on MMLU. The online fallback raises GSM8K accuracy by +1.0 point at unchanged length; no configuration is both shorter and at least as accurate on all three benchmarks (all results reported with intervals).
 
 **Reproduction (AdaptThink-1.5B, delta 0.05; accuracy % / average length in tokens)**
 
@@ -25,17 +26,38 @@ This repository is a copy of [THU-KEG/AdaptThink](https://github.com/THU-KEG/Ada
 | lr 3e-5 | -0.57, -18.1% | -0.45, -16.3% | -4.79, -4.9% |
 | mode-preserving selection | +0.04, -11.6% | -0.40, -1.3% | -2.29, +7.2% |
 
-The length saving comes from choosing NoThinking more often (not from shorter answers inside a mode), and on the hardest set it costs accuracy. Details, intervals and ablations: [REPORT.md](REPORT.md).
+The length saving comes from choosing NoThinking more often (not from shorter answers inside a mode), and on the hardest set it costs accuracy.
+
+**Online implicit-thinking fallback, change vs the delta=0.05 checkpoint (accuracy points, length %)**
+
+A NoThinking answer is stopped at its first "Wait"/"Alternatively" and the problem is re-solved in Thinking mode; the aborted tokens are counted in the length.
+
+| | GSM8K | MATH500 | AIME24 |
+|---|---|---|---|
+| delta=0.05 + fallback | **+0.99 [+0.08, +1.88]**, +1.2% | +0.15, +14.9% | +1.88, +17.8% |
+| LoRA lr 3e-5 + fallback | -0.42, -13.5% | -0.25, +2.3% | +0.21, +20.5% |
+
+The fallback buys accuracy with tokens: it removes LoRA's AIME24 loss (-4.79 without it), and on GSM8K, where it rarely fires (2% of answers), it improves accuracy at no length cost.
+
+**MMLU (out of domain, 2,000-question subset; accuracy % / length)**
+
+| | Original | AdaptThink delta=0.05 | Change |
+|---|---|---|---|
+| Paper (full MMLU) | 35.7 / 1724 | 42.2 / 1055 | +6.5 points, -38.8% |
+| This repo | 35.9 / 1589 | 40.1 / 992 | +4.2 points, -37.6% |
+
+Details, intervals and ablations: [REPORT.md](REPORT.md).
 
 **Where things are**
 
 - [REPORT.md](REPORT.md): technical report. [REPRODUCTION.md](REPRODUCTION.md): earlier reproduction notes.
 - [docs/SETUP_20GB_WSL2.md](docs/SETUP_20GB_WSL2.md): environment and the fixes needed on a 20 GB card; [docs/demo_examples.md](docs/demo_examples.md): demo transcripts.
 - `scripts/run_eval_local.sh`: single-GPU evaluation of released checkpoints; `scripts/run_*_chain.sh`: ablation and test runs.
-- `analysis/`: standalone vLLM sampling and grading (`gen_natural.py`), data selection (`select_sft_data.py`), LoRA training (`sft_lora.py`), tables and analyses.
+- `analysis/`: standalone vLLM sampling and grading (`gen_natural.py`), data selection (`select_sft_data.py`), LoRA training (`sft_lora.py`), online fallback (`fallback_online.py`, tables: `fallback_table.py`), tables and analyses.
+- `scripts/run_fallback_chain.sh`: runs the online-fallback and MMLU experiments; finished steps are skipped, so it can simply be restarted after an interruption. If a step fails with "GPU memory was not properly cleaned up", stop leftover processes with `pkill -f fallback_online.py` and rerun it.
 - `results/`: tables and plots. `app/app.py`: Gradio demo (own conda env, see the setup notes).
 
-**Limitations.** Released checkpoints were re-evaluated, not retrained; mostly one training seed; AIME24 has only 30 problems. All credit for the method goes to the paper's authors; please cite their paper (citation at the end of the original README).
+**Limitations.** Released checkpoints were re-evaluated, not retrained; mostly one training or sampling seed; AIME24 has only 30 problems; MMLU was evaluated on a 2,000-question subset. All credit for the method goes to the paper's authors; please cite their paper (citation at the end of the original README).
 
 ---
 
