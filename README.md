@@ -215,3 +215,4 @@ If you find our work useful, consider citing AdaptThink:
   year={2025}
 }
 ```
+**Full Report:** [AdaptThink_IEEE_Style_Report (PDF)](docs/AdaptThink_Report.pdf) · [Markdown version with all tables](REPORT.md)
