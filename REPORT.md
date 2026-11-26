@@ -1,6 +1,6 @@
 # Re-evaluating AdaptThink on a Single 20 GB GPU: Reproduction, Failure Analysis, Self-Distillation and an Online Implicit-Thinking Fallback
 
-Author: Aqsa Abbasi
+Author: Aqsa Abbasi. Setup notes: [docs/SETUP_20GB_WSL2.md](docs/SETUP_20GB_WSL2.md). Earlier reproduction notes: [REPRODUCTION.md](REPRODUCTION.md).
 
 ## 1. Introduction
 
