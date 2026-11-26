@@ -57,7 +57,7 @@ Run: `conda activate adapt_gui && python app/app.py`, then open http://localhost
 **Where things are**
 
 - [REPORT.md](REPORT.md): technical report. [REPRODUCTION.md](REPRODUCTION.md): earlier reproduction notes.
-- [docs/SETUP_20GB_WSL2.md](docs/SETUP_20GB_WSL2.md): environment and the fixes needed on a 20 GB card; [docs/demo_examples.md](docs/demo_examples.md): demo transcripts.
+- [docs/SETUP_20GB_WSL2.md](docs/SETUP_20GB_WSL2.md): environment and the fixes needed on a 20 GB card; [docs/gui_screenshot.png](docs/gui_screenshot.png): demo app screenshot.
 - `scripts/run_eval_local.sh`: single-GPU evaluation of released checkpoints; `scripts/run_*_chain.sh`: ablation and test runs.
 - `analysis/`: standalone vLLM sampling and grading (`gen_natural.py`), data selection (`select_sft_data.py`), LoRA training (`sft_lora.py`), online fallback (`fallback_online.py`, tables: `fallback_table.py`), tables and analyses.
 - `scripts/run_fallback_chain.sh`: runs the online-fallback and MMLU experiments; finished steps are skipped, so it can simply be restarted after an interruption. If a step fails with "GPU memory was not properly cleaned up", stop leftover processes with `pkill -f fallback_online.py` and rerun it.
