@@ -72,19 +72,19 @@ Run: `conda activate adapt_gui && python app/app.py`, then open http://localhost
 # [EMNLP2025] AdaptThink: LLM Can Learn When to Think
 
 <p align="center">
-    🤗 <a href="https://huggingface.co/collections/THU-KEG/adaptthink-682a1059aa9f5102c4fa0470" target="_blank">HF Repo</a> • 📃 <a href="https://arxiv.org/abs/2505.13417" target="_blank">Paper</a>
+     <a href="https://huggingface.co/collections/THU-KEG/adaptthink-682a1059aa9f5102c4fa0470" target="_blank">HF Repo</a> • 📃 <a href="https://arxiv.org/abs/2505.13417" target="_blank">Paper</a>
 </p>
 
 ## 🔍 Table of Contents
-- [🤖️ AdaptThink](#adapt_think)
-- [⚙️ Released Models](#model)
-- [🔥 Training](#training)
-- [📊 Evaluation](#evaluation)
-- [🧐 Cases](#cases)
-- [📝 Citation](#citation)
+- [AdaptThink](#adapt_think)
+- [Released Models](#model)
+- [Training](#training)
+- [Evaluation](#evaluation)
+- [Cases](#cases)
+- [Citation](#citation)
 
 <a name="adapt_think"></a>
-## 🤖️ AdaptThink
+## AdaptThink
 We present **AdapThink**, a novel reinforcement learning (RL) algorithm that enables reasoning models to adaptively choose between **Thinking** and **NoThinking** modes according to the difficulty of each input problem, thereby achieving automatic hybrid reasoning. Specifically, the model engages in thinking only when the problem is determined to be challenging; for other simple questions, it will bypass the thinking process and directly produce a concise final solution. This approach substantially reduces inference costs while further improving overall performance.
 <img width="1327" alt="image" src="https://github.com/user-attachments/assets/35f62f31-3210-4f11-98cb-06d73e0231e8" />
 
@@ -110,7 +110,7 @@ All the trained models are available on HuggingFace.
 | AdaptThink-7B-delta0.05 | [🤗 HF Repo](https://huggingface.co/THU-KEG/AdaptThink-7B-delta0.05) |
 
 <a name="training"></a>
-## 🔥 Training
+## Training
 
 Our training code is based on [VeRL](https://github.com/volcengine/verl) framework.
 
@@ -160,7 +160,7 @@ bash submit_mpi.sh scripts/run_adapt_think_7b_deepscaler_16k_delta0.05_btz128_lr
 
 
 <a name="evaluation"></a>
-## 📊 Evaluation
+## Evaluation
 During training, VeRL will automatically evaluate on you selected test sets for every `trainer.test_freq` step.
 
 We also provide additional scripts for evaluation.
@@ -191,7 +191,7 @@ We list our evaluation results as follows:
 #### 4. Evaluation results on MMLU
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/fdd20adc-b879-4105-8420-0851944c507f" />
 
-## 🧐 Cases
+## Cases
 ### Simple problem
 ![image](https://github.com/user-attachments/assets/1f6aaa1c-a1c8-4d49-92c5-2e1b219a643a)
 ![image](https://github.com/user-attachments/assets/1c3d2dbc-5a98-4066-a8a8-90afff0fc7a3)
@@ -202,7 +202,7 @@ We list our evaluation results as follows:
 
 
 <a name="citation"></a>
-## 📝 Citation
+## Citation
 
 If you find our work useful, please consider citing AdaptThink:
 
